@@ -12,4 +12,9 @@ public class GetUserResponse {
     private String username;
     private String email;
     private String name;
+    private String phone;
+    private String address;
+    private String createdAt;
+    private String imageUrl;
+    private String role;
 }

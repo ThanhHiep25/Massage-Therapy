@@ -4,14 +4,23 @@ import com.example.spa.dto.request.UserLoginRequest;
 import com.example.spa.dto.request.UserRegisterRequest;
 import com.example.spa.dto.response.GetUserResponse;
 import com.example.spa.dto.response.UserResponse;
+import com.example.spa.entities.Role;
 import com.example.spa.entities.User;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
 import com.example.spa.repositories.UserRepository;
+import com.example.spa.services.RoleService;
 import com.example.spa.services.UserService;
 import com.example.spa.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,42 +41,125 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private OtpService otpService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @Override
+//    public UserResponse register(UserRegisterRequest user) {
+//
+//        if (userRepository.existsByUsername(user.getUsername())) {
+////            throw new RuntimeException("Username already exists!");
+//            throw new AppException(ErrorCode.INVALID_DOB);
+//        }
+//        if (userRepository.existsByEmail(user.getEmail())) {
+//            throw new RuntimeException("Email already exists!");
+//        }
+//
+//
+//
+//        User useSave = User.builder()
+//                .username(user.getUsername())
+//                .email(user.getEmail())
+//                .phone(user.getPhone())
+//                .name(user.getName())
+//                .password(passwordEncoder.encode(user.getPassword()))
+//                .address(user.getAddress())
+//                .createdAt(user.getCreatedAt())
+//                .updatedAt(user.getUpdatedAt())
+//                .role(user.getRole())
+//                .build();
+//        userRepository.save(useSave);
+//        return new UserResponse().builder()
+//                .username(user.getUsername())
+//                .email(user.getEmail())
+//                .phone(user.getPhone())
+//                .name(user.getName())
+//                .role(user.getRole().getRoleName())
+//                .build();
+//    }
     public UserResponse register(UserRegisterRequest user) {
-
         if (userRepository.existsByUsername(user.getUsername())) {
-//            throw new RuntimeException("Username already exists!");
             throw new AppException(ErrorCode.INVALID_DOB);
         }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already exists!");
         }
-        User useSave = User.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .name(user.getName())
-                .password(passwordEncoder.encode(user.getPassword()))
-                .address(user.getAddress())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .role(user.getRole())
-                .build();
-        userRepository.save(useSave);
+
+        // Tạo OTP và gửi qua email
+        String otp = otpService.generateOtp();
+        otpService.sendOtpEmail(user.getEmail(), otp);
+
+        // Lưu thông tin đăng ký tạm thời vào cơ sở dữ liệu hoặc bộ nhớ
+        otpService.savePendingUser(user);
+
         return new UserResponse().builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .name(user.getName())
+                .imageUrl(user.getImageUrl())
                 .role(user.getRole().getRoleName())
                 .build();
     }
-    
+
+
+    public UserResponse verifyOtp(String email, String otp) {
+        String verificationResult = otpService.verifyOtp(email, otp);
+
+        if (!"Xác thực thành công".equals(verificationResult)) {
+            throw new RuntimeException(verificationResult);
+        }
+
+        // Lấy thông tin đăng ký tạm thời
+        UserRegisterRequest pendingUser = otpService.getPendingUser(email);
+        if (pendingUser == null) {
+            throw new RuntimeException("No pending registration found for this email");
+        }
+
+        // Kiểm tra xem role có hợp lệ hay không trước khi lưu vào cơ sở dữ liệu
+        if (pendingUser.getRole() == null) {
+            // Tạo vai trò mặc định nếu không có
+            Role defaultRole = roleService.findByName("superadmin");
+            if (defaultRole == null) {
+                throw new RuntimeException("Role 'superadmin' not found.");
+            }
+            pendingUser.setRole(defaultRole);
+        }
+
+        // Lưu người dùng vào cơ sở dữ liệu, chỉ sau khi OTP xác thực thành công
+        User userToSave = User.builder()
+                .username(pendingUser.getUsername())
+                .email(pendingUser.getEmail())
+                .phone(pendingUser.getPhone())
+                .name(pendingUser.getName())
+                .password(passwordEncoder.encode(pendingUser.getPassword()))
+                .address(pendingUser.getAddress())
+                .createdAt(pendingUser.getCreatedAt())
+                .updatedAt(pendingUser.getUpdatedAt())
+                .imageUrl(pendingUser.getImageUrl())
+                .role(pendingUser.getRole()) // Đảm bảo role được gán chính xác
+                .build();
+        userRepository.save(userToSave);
+
+        // Xóa thông tin tạm thời sau khi đăng ký thành công
+        otpService.clearPendingUser(email);
+
+        return new UserResponse().builder()
+                .username(userToSave.getUsername())
+                .email(userToSave.getEmail())
+                .phone(userToSave.getPhone())
+                .name(userToSave.getName())
+                .role(userToSave.getRole() != null ? userToSave.getRole().getRoleName() : "No Role Assigned")
+                .build();
+    }
 
 //    @Override
-//    public String login(UserLoginRequest request) {
+//    public Map<String, String> login(UserLoginRequest request) {
 //        User user = userRepository.findByUsername(request.getUsername())
 //                .orElseThrow(() -> new RuntimeException("Invalid username or password!"));
 //
@@ -75,28 +167,48 @@ public class UserServiceImpl implements UserService {
 //            throw new RuntimeException("Invalid username or password!");
 //        }
 //
-//        return jwtUtil.generateToken(request.getUsername());
+//        // Tạo Access Token và Refresh Token
+//        String accessToken = jwtUtil.generateToken(request.getUsername());
+//        String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
+//
+//        Map<String, String> tokens = new HashMap<>();
+//        tokens.put("accessToken", accessToken);
+//        tokens.put("refreshToken", refreshToken);
+//
+//        return tokens;
 //    }
+@Override
+public Map<String, Object> login(UserLoginRequest request) {
+    User user = userRepository.findByUsername(request.getUsername())
+            .orElseThrow(() -> new RuntimeException("Invalid username or password!"));
 
-    @Override
-    public Map<String, String> login(UserLoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Invalid username or password!"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password!");
-        }
-
-        // Tạo Access Token và Refresh Token
-        String accessToken = jwtUtil.generateToken(request.getUsername());
-        String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
-
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-
-        return tokens;
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        throw new RuntimeException("Invalid username or password!");
     }
+
+    // Tạo Access Token và Refresh Token
+    String accessToken = jwtUtil.generateToken(request.getUsername());
+    String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
+
+    // Chuẩn bị dữ liệu phản hồi
+    Map<String, Object> response = new HashMap<>();
+    response.put("accessToken", accessToken);
+    response.put("refreshToken", refreshToken);
+    response.put("user", Map.of(
+            "username", user.getUsername(),
+            "name", user.getName(),
+            "email", user.getEmail(),
+            "phone", user.getPhone(),
+            "address", user.getAddress(),
+            "imageUrl", user.getImageUrl(),
+            "createdAt", user.getCreatedAt(),
+            "description", user.getDescription(),
+            "roles", user.getRole().getRoleName() // Nếu có vai trò
+    ));
+
+    return response;
+}
+
 
     @Override
     public String refreshToken(String refreshToken){
@@ -116,6 +228,11 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .username(user.getUsername())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .imageUrl(user.getImageUrl())
+                .createdAt(user.getCreatedAt().toString())
+                .role(user.getRole().getRoleName())
                 .build();
     }
 
@@ -152,4 +269,28 @@ public class UserServiceImpl implements UserService {
         // Proceed to delete if the user is not a superadmin
         userRepository.deleteById(id);
     }
+
+    @Override
+    public String extractTokenFromCookies(Cookie[] cookies) {
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true); // Nếu dùng HTTPS
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // Xóa cookie bằng cách đặt maxAge là 0
+        response.addCookie(cookie);
+    }
+
+
 }

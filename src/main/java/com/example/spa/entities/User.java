@@ -45,7 +45,11 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Column(name = "image_url")
+    private String imageUrl;
+
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "role_id")
     private Role role;
 
@@ -60,6 +64,7 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    private String status;
 
     @Override
     public String toString() {
@@ -69,9 +74,13 @@ public class User {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", address=" + address +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", role=" + role +
                 ", description='" + description + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }

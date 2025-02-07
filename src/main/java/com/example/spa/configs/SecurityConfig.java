@@ -93,9 +93,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable()) // Tắt bảo vệ CSRF
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/api/auth/login",
-                                "/api/auth/register",
-                                "/api/auth/refresh",
+                                "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll() // Các endpoint công khai
