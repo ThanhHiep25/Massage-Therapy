@@ -39,13 +39,6 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
     }
 
 
-
-//    @Override
-//    public ServiceSpa createServiceSpa(ServiceSpaRequest request) {
-//        var serviceSPA = serviceSpaMapper.toServiceSpa(request);
-//        return  serviceSpaRepository.save(serviceSPA);
-//    }
-
     @Override
     public ServiceSpa getServiceSpaById(Long id) {
         return serviceSpaRepository.findById(id).orElseThrow(() ->

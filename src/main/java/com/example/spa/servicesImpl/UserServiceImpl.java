@@ -50,38 +50,6 @@ public class UserServiceImpl implements UserService {
     private JwtUtil jwtUtil;
 
     @Override
-//    public UserResponse register(UserRegisterRequest user) {
-//
-//        if (userRepository.existsByUsername(user.getUsername())) {
-////            throw new RuntimeException("Username already exists!");
-//            throw new AppException(ErrorCode.INVALID_DOB);
-//        }
-//        if (userRepository.existsByEmail(user.getEmail())) {
-//            throw new RuntimeException("Email already exists!");
-//        }
-//
-//
-//
-//        User useSave = User.builder()
-//                .username(user.getUsername())
-//                .email(user.getEmail())
-//                .phone(user.getPhone())
-//                .name(user.getName())
-//                .password(passwordEncoder.encode(user.getPassword()))
-//                .address(user.getAddress())
-//                .createdAt(user.getCreatedAt())
-//                .updatedAt(user.getUpdatedAt())
-//                .role(user.getRole())
-//                .build();
-//        userRepository.save(useSave);
-//        return new UserResponse().builder()
-//                .username(user.getUsername())
-//                .email(user.getEmail())
-//                .phone(user.getPhone())
-//                .name(user.getName())
-//                .role(user.getRole().getRoleName())
-//                .build();
-//    }
     public UserResponse register(UserRegisterRequest user) {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new AppException(ErrorCode.INVALID_DOB);
@@ -158,66 +126,81 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-//    @Override
-//    public Map<String, String> login(UserLoginRequest request) {
-//        User user = userRepository.findByUsername(request.getUsername())
-//                .orElseThrow(() -> new RuntimeException("Invalid username or password!"));
-//
-//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-//            throw new RuntimeException("Invalid username or password!");
-//        }
-//
-//        // Tạo Access Token và Refresh Token
-//        String accessToken = jwtUtil.generateToken(request.getUsername());
-//        String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
-//
-//        Map<String, String> tokens = new HashMap<>();
-//        tokens.put("accessToken", accessToken);
-//        tokens.put("refreshToken", refreshToken);
-//
-//        return tokens;
-//    }
-@Override
-public Map<String, Object> login(UserLoginRequest request) {
-    User user = userRepository.findByUsername(request.getUsername())
-            .orElseThrow(() -> new RuntimeException("Invalid username or password!"));
 
-    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-        throw new RuntimeException("Invalid username or password!");
+    @Override
+    public Map<String, Object> login(UserLoginRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("Invalid username or password!"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid username or password!");
+        }
+
+        // Tạo Access Token và Refresh Token
+        String accessToken = jwtUtil.generateToken(request.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
+
+        // Chuẩn bị dữ liệu phản hồi
+        Map<String, Object> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
+        response.put("user", Map.of(
+                "username", user.getUsername(),
+                "name", user.getName(),
+                "email", user.getEmail(),
+                "phone", user.getPhone(),
+                "address", user.getAddress(),
+                "imageUrl", user.getImageUrl(),
+                "createdAt", user.getCreatedAt(),
+                "description", user.getDescription(),
+                "roles", user.getRole().getRoleName()
+        ));
+
+        return response;
     }
-
-    // Tạo Access Token và Refresh Token
-    String accessToken = jwtUtil.generateToken(request.getUsername());
-    String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
-
-    // Chuẩn bị dữ liệu phản hồi
-    Map<String, Object> response = new HashMap<>();
-    response.put("accessToken", accessToken);
-    response.put("refreshToken", refreshToken);
-    response.put("user", Map.of(
-            "username", user.getUsername(),
-            "name", user.getName(),
-            "email", user.getEmail(),
-            "phone", user.getPhone(),
-            "address", user.getAddress(),
-            "imageUrl", user.getImageUrl(),
-            "createdAt", user.getCreatedAt(),
-            "description", user.getDescription(),
-            "roles", user.getRole().getRoleName() // Nếu có vai trò
-    ));
-
-    return response;
-}
 
 
     @Override
-    public String refreshToken(String refreshToken){
+    public String refreshToken(String refreshToken) {
         String username = jwtUtil.extractUsername(refreshToken);
-        if (username != null || !jwtUtil.isTokenValid(refreshToken, username)){
+        if (username != null || !jwtUtil.isTokenValid(refreshToken, username)) {
             throw new RuntimeException("Invalid refresh token");
         }
         return jwtUtil.generateToken(username);
     }
+
+    @Override
+    public String forgotPassword(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        String otp = otpService.generateOtp();
+        otpService.sendOtpEmail(email, otp);
+        return "OTP sent to email";
+    }
+
+    @Override
+    public String resetPassword(String email, String otp, String newPassword) {
+        // Kiểm tra OTP
+        String verificationResult = otpService.verifyOtp(email, otp);
+        if (!"Xác thực thành công".equals(verificationResult)) {
+            // Ném lỗi chi tiết để frontend xử lý dễ hơn
+            throw new IllegalArgumentException(verificationResult);
+        }
+        // Tìm kiếm người dùng theo email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Xóa OTP sau khi reset thành công để tránh tái sử dụng
+        otpService.clearPendingUser(email);
+
+        return "Đặt lại mật khẩu thành công";
+    }
+
 
     @Override
     public GetUserResponse getUserById(Long id) {

@@ -26,4 +26,6 @@ public interface UserService {
     String extractTokenFromCookies(Cookie[] cookies);
     UserResponse verifyOtp(String email, String otp);
     void logout(HttpServletResponse response);
+    String forgotPassword(String email);
+    String resetPassword (String email,String otp, String newPassword);
 }

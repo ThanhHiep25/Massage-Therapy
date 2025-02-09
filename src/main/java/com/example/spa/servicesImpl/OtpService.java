@@ -17,7 +17,7 @@ public class OtpService {
     @Autowired
     private JavaMailSender mailSender;
 
-    private static final long OTP_EXPIRATION_TIME = 5 * 60 * 1000;  // 5 phút
+    private static final long OTP_EXPIRATION_TIME = 60 * 1000;  // 5 phút
     // Lưu thông tin đăng ký tạm thời
     private Map<String, UserRegisterRequest> pendingUsers = new HashMap<>();
 
@@ -49,31 +49,66 @@ public class OtpService {
     }
 
 
+//    public String verifyOtp(String email, String inputOtp) {
+//        OtpData otpData = otpStorage.get(email);
+//        if (otpData == null) {
+//            return "OTP không tồn tại"; // OTP không tồn tại
+//        }
+//
+//        long currentTime = Instant.now().toEpochMilli();
+//        System.out.println("Thời gian hiện tại: " + currentTime);
+//        System.out.println("Thời gian hết hạn: " + otpData.getExpirationTime());
+//        System.out.println("Còn lại: " + (otpData.getExpirationTime() - currentTime) + " ms");
+//
+//
+//        if (currentTime >= otpData.getExpirationTime()) {
+//            otpStorage.remove(email);  // Xóa OTP đã hết hạn
+//            return "OTP hết hạn"; // OTP hết hạn
+//        }
+//
+//        // In ra OTP để kiểm tra
+//        System.out.println("Stored OTP: " + otpData.getOtp());
+//        System.out.println("Input OTP: " + inputOtp);
+//
+//        if (otpData.getOtp().equals(inputOtp)) {
+//            otpStorage.remove(email);  // Xóa OTP sau khi xác thực thành công
+//            return "Xác thực thành công"; // OTP hợp lệ
+//        } else {
+//            return "OTP không khớp"; // OTP không chính xác
+//        }
+//    }
+
     public String verifyOtp(String email, String inputOtp) {
         OtpData otpData = otpStorage.get(email);
         if (otpData == null) {
-            return "OTP không tồn tại"; // OTP không tồn tại
+            return "OTP không tồn tại";
         }
 
         long currentTime = Instant.now().toEpochMilli();
-        System.out.println("Current Time: " + currentTime);
-        System.out.println("Expiration Time: " + otpData.getExpirationTime());
+        long expirationTime = otpData.getExpirationTime();
+        long timeLeft = expirationTime - currentTime;
 
-        if (currentTime > otpData.getExpirationTime()) {
-            otpStorage.remove(email);  // Xóa OTP đã hết hạn
-            return "OTP hết hạn"; // OTP hết hạn
+        System.out.println("Thời gian hiện tại: " + currentTime);
+        System.out.println("Thời gian hết hạn: " + expirationTime);
+        System.out.println("Còn lại: " + timeLeft + " ms");
+
+        // Kiểm tra hết hạn
+        if (timeLeft <= 0) {  // Kiểm tra điều kiện âm hoặc hết hạn
+            otpStorage.remove(email);
+            System.out.println("OTP đã hết hạn và bị xóa.");
+            return "OTP hết hạn";
         }
 
-        // In ra OTP để kiểm tra
-        System.out.println("Stored OTP: " + otpData.getOtp());
-        System.out.println("Input OTP: " + inputOtp);
-
+        // Kiểm tra OTP
         if (otpData.getOtp().equals(inputOtp)) {
-            return "Xác thực thành công"; // OTP hợp lệ
+            otpStorage.remove(email);  // Xóa OTP sau khi dùng thành công
+            System.out.println("Xác thực thành công và OTP đã bị xóa.");
+            return "Xác thực thành công";
         } else {
-            return "OTP không khớp"; // OTP không chính xác
+            return "OTP không khớp";
         }
     }
+
 
 
     // Lưu thông tin người dùng tạm thời
