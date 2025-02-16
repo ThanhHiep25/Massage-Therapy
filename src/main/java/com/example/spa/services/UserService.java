@@ -3,6 +3,7 @@ package com.example.spa.services;
 
 import com.example.spa.dto.request.UserLoginRequest;
 import com.example.spa.dto.request.UserRegisterRequest;
+import com.example.spa.dto.request.UserRequest;
 import com.example.spa.dto.response.GetUserResponse;
 import com.example.spa.dto.response.UserResponse;
 import com.example.spa.entities.User;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Map;
 
 public interface UserService {
@@ -28,4 +30,6 @@ public interface UserService {
     void logout(HttpServletResponse response);
     String forgotPassword(String email);
     String resetPassword (String email,String otp, String newPassword);
+    List<User> getAllUsers();
+    UserResponse updateUser(Long id, UserRequest request);
 }

@@ -17,4 +17,18 @@ public class GetUserResponse {
     private String createdAt;
     private String imageUrl;
     private String role;
+
+    @Override
+    public String toString() {
+        return "GetUserResponse{" +
+                "username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address='" + address + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", role='" + role + '\'' +
+                '}';
+    }
 }

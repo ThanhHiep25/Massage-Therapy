@@ -54,6 +54,10 @@ public class ServiceSpa {
     @Column(name = "service_type")
     private String service_type;
 
+    @ManyToMany(mappedBy = "services")
+    private List<Staff> staff = new ArrayList<>();
+
+
     @OneToMany(mappedBy = "serviceSpa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ServiceStep> steps = new ArrayList<>();
 

@@ -4,9 +4,11 @@ package com.example.spa.controllers;
 import com.example.spa.dto.ResultResponse;
 import com.example.spa.dto.request.UserLoginRequest;
 import com.example.spa.dto.request.UserRegisterRequest;
+import com.example.spa.dto.request.UserRequest;
 import com.example.spa.dto.response.GetUserResponse;
 import com.example.spa.dto.response.UserResponse;
 import com.example.spa.entities.Role;
+import com.example.spa.entities.User;
 import com.example.spa.services.RoleService;
 import com.example.spa.services.UserService;
 import com.example.spa.servicesImpl.OtpService;
@@ -24,7 +26,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -172,21 +176,41 @@ public class AuthController {
         }
     }
 
+    // Get all users
+    @GetMapping("/all")
+    @Operation(summary = "Danh sách tất cả user", description = "Trả về danh sách tất cả user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })  // This method returns a list of UserResponse objects.
+    public ResponseEntity<List<UserResponse>> getAllusers(){
+        List<UserResponse> responses = userService.getAllUsers()
+                .stream()
+                .map(user -> new UserResponse((user)))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
+    }
 
-    @GetMapping("/users/{id}")
+
+    @GetMapping("/{id}")
     @Operation(summary = "Thông tin user", description = "Trả về thông tin user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")
     })
     public ResultResponse<?> getUser(@PathVariable Long id, HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        String token = userService.extractTokenFromCookies(cookies);
-        if (token == null || !jwtUtil.isTokenValid(token, jwtUtil.extractUsername(token))) {
-            return ResultResponse.builder().message("Unauthorized: Token missing or invalid").build();
-        }
         return ResultResponse.<GetUserResponse>builder().result(userService.getUserById(id)).build();
     }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request) {
+        UserResponse updatedUser = userService.updateUser(id, request);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
+
 
     @PostMapping("/logout")
     @Operation(summary = "Đăng xuất", description = "Xóa refreshToken trong cookie")

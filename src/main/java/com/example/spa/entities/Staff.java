@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -44,18 +45,18 @@ public class Staff {
     @Column(name = "start_date")
     private LocalDate startDate;
 
+    @ManyToMany
+    @JoinTable(
+            name = "staff_service",
+            joinColumns = @JoinColumn(name = "staff_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id")
+    )
+    private List<ServiceSpa> services = new ArrayList<>();
+
+
     @Column(name = "status")
     private String status; // "Active", "Inactive", v.v.
 
-    @Column(name = "customers_served")
-    private int customersServed;
-
-    @Column(name = "total_revenue")
-    private double totalRevenue;
-
-    @ManyToOne (cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "servicespa_id")
-    private ServiceSpa serviceSpa;
 
     @Override
     public String toString() {
@@ -70,9 +71,6 @@ public class Staff {
                 ", description='" + description + '\'' +
                 ", startDate=" + startDate +
                 ", status='" + status + '\'' +
-                ", customersServed=" + customersServed +
-                ", totalRevenue=" + totalRevenue +
-                ", serviceSpa=" + serviceSpa +
                 '}';
     }
 }

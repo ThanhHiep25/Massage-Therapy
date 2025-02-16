@@ -2,6 +2,7 @@ package com.example.spa.servicesImpl;
 
 import com.example.spa.dto.request.UserLoginRequest;
 import com.example.spa.dto.request.UserRegisterRequest;
+import com.example.spa.dto.request.UserRequest;
 import com.example.spa.dto.response.GetUserResponse;
 import com.example.spa.dto.response.UserResponse;
 import com.example.spa.entities.Role;
@@ -12,21 +13,18 @@ import com.example.spa.repositories.UserRepository;
 import com.example.spa.services.RoleService;
 import com.example.spa.services.UserService;
 import com.example.spa.utils.JwtUtil;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,7 +50,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse register(UserRegisterRequest user) {
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new AppException(ErrorCode.INVALID_DOB);
+            throw new RuntimeException("User name already registered");
         }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already exists!");
@@ -110,6 +108,7 @@ public class UserServiceImpl implements UserService {
                 .createdAt(pendingUser.getCreatedAt())
                 .updatedAt(pendingUser.getUpdatedAt())
                 .imageUrl(pendingUser.getImageUrl())
+                .description(pendingUser.getDescription())
                 .role(pendingUser.getRole()) // Đảm bảo role được gán chính xác
                 .build();
         userRepository.save(userToSave);
@@ -145,6 +144,7 @@ public class UserServiceImpl implements UserService {
         response.put("accessToken", accessToken);
         response.put("refreshToken", refreshToken);
         response.put("user", Map.of(
+                "id", user.getUserId(),
                 "username", user.getUsername(),
                 "name", user.getName(),
                 "email", user.getEmail(),
@@ -201,6 +201,62 @@ public class UserServiceImpl implements UserService {
         return "Đặt lại mật khẩu thành công";
     }
 
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public UserResponse updateUser(Long id, UserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Cập nhật thông tin người dùng nếu có dữ liệu mới
+        if (request.getUsername() != null && !request.getUsername().isEmpty()) {
+            user.setUsername(request.getUsername());
+        }
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            // Kiểm tra email đã tồn tại chưa
+            if (userRepository.existsByEmail(request.getEmail()) && !user.getEmail().equals(request.getEmail())) {
+                throw new RuntimeException("Email already exists!");
+            }
+            user.setEmail(request.getEmail());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        if (request.getAddress() != null) {
+            user.setAddress(request.getAddress());
+        }
+        if (request.getImageUrl() != null) {
+            user.setImageUrl(request.getImageUrl());
+        }
+        if (request.getDescription() != null) {
+            user.setDescription(request.getDescription());
+        }
+
+        // Cập nhật mật khẩu nếu người dùng gửi mật khẩu mới
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        userRepository.save(user);
+
+        return UserResponse.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .name(user.getName())
+                .address(user.getAddress())
+                .imageUrl(user.getImageUrl())
+                .description(user.getDescription())
+                .role(user.getRole().getRoleName())
+                .build();
+    }
+
 
     @Override
     public GetUserResponse getUserById(Long id) {
@@ -240,6 +296,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
+
     @Override
     public void deleteUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
@@ -274,6 +331,8 @@ public class UserServiceImpl implements UserService {
         cookie.setMaxAge(0); // Xóa cookie bằng cách đặt maxAge là 0
         response.addCookie(cookie);
     }
+
+
 
 
 }
