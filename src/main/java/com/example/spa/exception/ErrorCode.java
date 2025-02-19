@@ -16,8 +16,13 @@ public enum ErrorCode {
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID(1009, "Token invalid verify", HttpStatus.UNAUTHORIZED),
-    ROLE_INVALID(1010, "Role must be candidate or company", HttpStatus.NOT_FOUND),;
-
+    ROLE_INVALID(1010, "Role must be candidate or company", HttpStatus.NOT_FOUND),
+    POSITION_INVALID(1011, "Position not found", HttpStatus.NOT_FOUND),
+    POSITION_NOT_EXISTED(1012, "Position not found", HttpStatus.NOT_FOUND),
+    POSITION_UPDATED(1013, "Position updated successfully", HttpStatus.OK),
+    POSITION_CREATED(1014, "Position created successfully", HttpStatus.CREATED),
+    POSITION_DELETED(1015, "Position deleted successfully", HttpStatus.NO_CONTENT),
+    POSITION_ALREADY_EXISTED(1016, "Position name already existed", HttpStatus.BAD_REQUEST),;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;

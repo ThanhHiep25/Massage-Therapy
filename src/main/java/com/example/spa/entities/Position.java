@@ -18,11 +18,14 @@ public class Position {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long positionId;
 
-    @Column(name = "position_name")
+    @Column(name = "position_name", nullable = false, unique = true)
     private String positionName;
 
     @Column(name = "description")
     private String description;
+
+    @ManyToOne
+    private Department department;
 
     @Override
     public String toString() {
@@ -30,6 +33,7 @@ public class Position {
                 "positionId=" + positionId +
                 ", positionName='" + positionName + '\'' +
                 ", description='" + description + '\'' +
+                ", department=" + department +
                 '}';
     }
 }

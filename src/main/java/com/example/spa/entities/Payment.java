@@ -38,4 +38,10 @@ public class Payment {
   @JoinColumn(name = "appointment_id", nullable = false)
   private Appointment appointment;
 
+  @Column(name = "transaction_time", nullable = false)
+  private LocalDateTime transactionTime;
+
+  @Column(name = "bank_code")
+  private String bankCode;
+
 }
