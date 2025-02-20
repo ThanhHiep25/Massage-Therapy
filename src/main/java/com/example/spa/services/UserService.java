@@ -32,4 +32,7 @@ public interface UserService {
     String resetPassword (String email,String otp, String newPassword);
     List<User> getAllUsers();
     UserResponse updateUser(Long id, UserRequest request);
+    void deleteUser(Long id);
+    void deactivateUser(Long id);
+    void activateUser(Long id);
 }

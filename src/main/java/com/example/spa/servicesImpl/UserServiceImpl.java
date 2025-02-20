@@ -9,6 +9,7 @@ import com.example.spa.entities.Role;
 import com.example.spa.entities.User;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
+import com.example.spa.exception.UserStatus;
 import com.example.spa.repositories.UserRepository;
 import com.example.spa.services.RoleService;
 import com.example.spa.services.UserService;
@@ -69,6 +70,8 @@ public class UserServiceImpl implements UserService {
                 .phone(user.getPhone())
                 .name(user.getName())
                 .imageUrl(user.getImageUrl())
+                .description(user.getDescription())
+                .address(user.getAddress())
                 .role(user.getRole().getRoleName())
                 .build();
     }
@@ -109,6 +112,7 @@ public class UserServiceImpl implements UserService {
                 .updatedAt(pendingUser.getUpdatedAt())
                 .imageUrl(pendingUser.getImageUrl())
                 .description(pendingUser.getDescription())
+                .status(UserStatus.ACTIVE) // Mặc định là ACTIVE
                 .role(pendingUser.getRole()) // Đảm bảo role được gán chính xác
                 .build();
         userRepository.save(userToSave);
@@ -332,6 +336,27 @@ public class UserServiceImpl implements UserService {
         response.addCookie(cookie);
     }
 
+
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
+        user.setStatus(UserStatus.DELETED); // Chỉ đánh dấu là đã "xóa"
+        userRepository.save(user);
+    }
+
+    public void deactivateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
+        user.setStatus(UserStatus.DEACTIVATED); // Chuyển trạng thái thành DEACTIVATED
+        userRepository.save(user);
+    }
+
+    public void activateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User không tồn tại!"));
+        user.setStatus(UserStatus.ACTIVE); // Kích hoạt lại user
+        userRepository.save(user);
+    }
 
 
 

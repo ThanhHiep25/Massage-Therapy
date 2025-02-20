@@ -1,10 +1,8 @@
 package com.example.spa.entities;
 
+import com.example.spa.exception.UserStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -22,22 +20,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
 
-
     @Column(name = "name")
     private String name;
-
 
     @Column(name = "user_name")
     private String username;
 
-
     @Column(name = "email")
     private String email;
 
-
     @Column(name = "password")
     private String password;
-
 
     @Column(name = "address")
     private String address;
@@ -48,11 +41,9 @@ public class User {
     @Column(name = "image_url")
     private String imageUrl;
 
-
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "role_id")
     private Role role;
-
 
     @Column(name = "description")
     private String description;
@@ -64,7 +55,9 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private String status;
+    @Enumerated(EnumType.STRING) // Lưu enum dưới dạng chuỗi trong DB
+    @Column(name = "status", nullable = false)
+    private UserStatus status = UserStatus.ACTIVE; // Mặc định là ACTIVE
 
     @Override
     public String toString() {
@@ -81,6 +74,7 @@ public class User {
                 ", description='" + description + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
+                ", status=" + status +
                 '}';
     }
 }

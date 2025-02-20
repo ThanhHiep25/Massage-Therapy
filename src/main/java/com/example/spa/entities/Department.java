@@ -17,8 +17,10 @@ public class Department {
   private Long departmentId;
 
   private String departmentName;
+
   private String description;
 
   @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Position> positions;
+
 }

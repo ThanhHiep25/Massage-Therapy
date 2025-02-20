@@ -1,9 +1,12 @@
 package com.example.spa.servicesImpl;
 
 import com.example.spa.dto.request.UserRegisterRequest;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,7 +20,7 @@ public class OtpService {
     @Autowired
     private JavaMailSender mailSender;
 
-    private static final long OTP_EXPIRATION_TIME = 60 * 1000;  // 5 phút
+    private static final long OTP_EXPIRATION_TIME = 3 * 60 * 1000;  // 3 phút
     // Lưu thông tin đăng ký tạm thời
     private Map<String, UserRegisterRequest> pendingUsers = new HashMap<>();
 
@@ -33,50 +36,42 @@ public class OtpService {
     // Gửi OTP qua email
     public void sendOtpEmail(String toEmail, String otp) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(toEmail);
-            message.setSubject("Your OTP for Registration");
-            message.setText("Your OTP code is: " + otp);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(toEmail);
+            helper.setSubject("🔒 Xác nhận OTP của bạn");
+
+            // 📨 Nội dung email có HTML đẹp hơn
+            String emailContent = """
+                <div style="font-family: Arial, sans-serif; max-width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+                    <h2 style="color: #4CAF50; text-align: center;">🔑 Mã OTP của bạn</h2>
+                    <p style="font-size: 16px; color: #333; text-align: center;">
+                        Mã xác nhận của bạn là: <br>
+                        <strong style="font-size: 24px; color: #d9534f;">%s</strong>
+                    </p>
+                    <p style="text-align: center; font-size: 14px; color: #666;">
+                        Mã này sẽ hết hạn sau 3 phút. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.
+                    </p>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="#" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+                            Xác nhận ngay
+                        </a>
+                    </div>
+                </div>
+            """.formatted(otp);
+
+            helper.setText(emailContent, true); // Set nội dung email là HTML
             mailSender.send(message);
 
             // Lưu OTP vào bộ nhớ với thời gian hết hạn
-            otpStorage.put(toEmail, new OtpData(otp, Instant.now().toEpochMilli() + OTP_EXPIRATION_TIME));
-        } catch (Exception e) {
-            // Log lỗi nếu có sự cố khi gửi email
-            e.printStackTrace();
-            throw new RuntimeException("Error sending OTP email: " + e.getMessage());
+            otpStorage.put(toEmail, new OtpData(otp, System.currentTimeMillis() + OTP_EXPIRATION_TIME));
+
+        } catch (MessagingException e) {
+            throw new RuntimeException("Lỗi gửi OTP: " + e.getMessage());
         }
     }
 
-
-//    public String verifyOtp(String email, String inputOtp) {
-//        OtpData otpData = otpStorage.get(email);
-//        if (otpData == null) {
-//            return "OTP không tồn tại"; // OTP không tồn tại
-//        }
-//
-//        long currentTime = Instant.now().toEpochMilli();
-//        System.out.println("Thời gian hiện tại: " + currentTime);
-//        System.out.println("Thời gian hết hạn: " + otpData.getExpirationTime());
-//        System.out.println("Còn lại: " + (otpData.getExpirationTime() - currentTime) + " ms");
-//
-//
-//        if (currentTime >= otpData.getExpirationTime()) {
-//            otpStorage.remove(email);  // Xóa OTP đã hết hạn
-//            return "OTP hết hạn"; // OTP hết hạn
-//        }
-//
-//        // In ra OTP để kiểm tra
-//        System.out.println("Stored OTP: " + otpData.getOtp());
-//        System.out.println("Input OTP: " + inputOtp);
-//
-//        if (otpData.getOtp().equals(inputOtp)) {
-//            otpStorage.remove(email);  // Xóa OTP sau khi xác thực thành công
-//            return "Xác thực thành công"; // OTP hợp lệ
-//        } else {
-//            return "OTP không khớp"; // OTP không chính xác
-//        }
-//    }
 
     public String verifyOtp(String email, String inputOtp) {
         OtpData otpData = otpStorage.get(email);

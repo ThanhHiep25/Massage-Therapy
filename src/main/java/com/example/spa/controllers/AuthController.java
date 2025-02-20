@@ -209,15 +209,51 @@ public class AuthController {
         return ResponseEntity.ok(updatedUser);
     }
 
-
-
-
     @PostMapping("/logout")
     @Operation(summary = "Đăng xuất", description = "Xóa refreshToken trong cookie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
     public ResponseEntity<?> logout(HttpServletResponse response) {
         userService.logout(response);
         return ResponseEntity.ok().body(ResultResponse.builder().message("Logged out successfully").build());
     }
 
+    // Xóa mềm user
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Xóa user", description = "Xóa user theo id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("User đã bị đánh dấu là xóa.");
+    }
+
+    // Vô hiệu hóa user
+    @PutMapping("/{id}/deactivate")
+    @Operation(summary = "Vô hiệu hóa user", description = "Vô hiệu hóa user theo id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> deactivateUser(@PathVariable Long id) {
+        userService.deactivateUser(id);
+        return ResponseEntity.ok("User đã bị vô hiệu hóa.");
+    }
+
+    // Kích hoạt lại user
+    @PutMapping("/{id}/activate")
+    @Operation(summary = "Kích hoạt user", description = "Kích hoạt user theo id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> activateUser(@PathVariable Long id) {
+        userService.activateUser(id);
+        return ResponseEntity.ok("User đã được kích hoạt lại.");
+    }
 
 }
