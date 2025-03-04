@@ -1,7 +1,6 @@
 package com.example.spa.dto.request;
 
 import com.example.spa.entities.Role;
-import com.example.spa.exception.UserStatus;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 

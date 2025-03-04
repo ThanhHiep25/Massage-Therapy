@@ -1,6 +1,8 @@
 package com.example.spa.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -59,7 +61,9 @@ public class ServiceSpa {
 
 
     @OneToMany(mappedBy = "serviceSpa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<ServiceStep> steps = new ArrayList<>();
+
 
     @Override
     public String toString() {

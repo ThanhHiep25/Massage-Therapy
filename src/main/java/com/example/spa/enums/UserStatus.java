@@ -1,6 +1,5 @@
-package com.example.spa.exception;
+package com.example.spa.enums;
 
-import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Getter

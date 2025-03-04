@@ -17,6 +17,7 @@ public class GetUserResponse {
     private String createdAt;
     private String imageUrl;
     private String role;
+    private String status;
 
     @Override
     public String toString() {
@@ -29,6 +30,7 @@ public class GetUserResponse {
                 ", createdAt='" + createdAt + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", role='" + role + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

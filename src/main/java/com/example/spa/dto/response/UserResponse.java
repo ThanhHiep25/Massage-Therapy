@@ -18,6 +18,7 @@ public class UserResponse {
     private String imageUrl;
     private String description;
     private String role;
+    private String status;
 
     public UserResponse(User updateUser) {
         this.id = updateUser.getUserId();
@@ -29,6 +30,7 @@ public class UserResponse {
         this.imageUrl = updateUser.getImageUrl();
         this.description = updateUser.getDescription();
         this.role = updateUser.getRole().getRoleName();
+        this.status = updateUser.getStatus().name();
 
     }
 
@@ -44,6 +46,7 @@ public class UserResponse {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", description='" + description + '\'' +
                 ", role='" + role + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }
