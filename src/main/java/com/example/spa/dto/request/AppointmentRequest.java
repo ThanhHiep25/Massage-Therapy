@@ -21,6 +21,8 @@ public class AppointmentRequest {
     private String notes;
     private AppointmentStatus status;
     private List<Long> serviceIds;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @Override
     public String toString() {
@@ -33,6 +35,8 @@ public class AppointmentRequest {
                 ", notes='" + notes + '\'' +
                 ", status=" + status +
                 ", serviceIds=" + serviceIds +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }

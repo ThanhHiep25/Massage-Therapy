@@ -3,6 +3,8 @@ package com.example.spa.entities;
 import com.example.spa.enums.AppointmentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,11 +24,11 @@ public class Appointment {
     private Long appointmentId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_user_id", nullable = false)
+    @JoinColumn(name = "user_user_id",referencedColumnName = "userId", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "staff_id", nullable = false)
+    @JoinColumn(name = "staff_id", referencedColumnName = "staffId", nullable = false)
     private Staff staff;
 
     @Column(name = "appointment_date_time", nullable = false)
@@ -53,4 +55,28 @@ public class Appointment {
             inverseJoinColumns = @JoinColumn(name = "service_id")
     )
     private List<ServiceSpa> services;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    @Override
+    public String toString() {
+        return "Appointment{" +
+                "appointmentId=" + appointmentId +
+                ", user=" + user +
+                ", staff=" + staff +
+                ", appointmentDateTime=" + appointmentDateTime +
+                ", totalPrice=" + totalPrice +
+                ", notes='" + notes + '\'' +
+                ", payment=" + payment +
+                ", status=" + status +
+                ", services=" + services +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

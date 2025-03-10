@@ -4,6 +4,7 @@ import com.example.spa.dto.request.UserLoginRequest;
 import com.example.spa.dto.request.UserRegisterRequest;
 import com.example.spa.dto.request.UserRequest;
 import com.example.spa.dto.response.GetUserResponse;
+import com.example.spa.dto.response.UserLoginResponse;
 import com.example.spa.dto.response.UserResponse;
 import com.example.spa.entities.Role;
 import com.example.spa.entities.User;
@@ -131,33 +132,57 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> login(UserLoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_INVALID));
+//        User user = userRepository.findByUsername(request.getUsername())
+//                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_INVALID));
+//
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_INVALID);
         }
 
         // Tạo Access Token và Refresh Token
-        String accessToken = jwtUtil.generateToken(request.getUsername());
-        String refreshToken = jwtUtil.generateRefreshToken(request.getUsername());
+        String accessToken = jwtUtil.generateToken(request.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(request.getEmail());
+
+//        // Chuẩn bị dữ liệu phản hồi
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("accessToken", accessToken);
+//        response.put("refreshToken", refreshToken);
+//        response.put("user", Map.of(
+//                "id", user.getUserId(),
+//                "username", user.getUsername(),
+//                "name", user.getName(),
+//                "email", user.getEmail(),
+//                "phone", user.getPhone(),
+//                "address", user.getAddress(),
+//                "imageUrl", user.getImageUrl(),
+//                "createdAt", user.getCreatedAt(),
+//                "description", user.getDescription(),
+//                "roles", user.getRole().getRoleName()
+//        ));
 
         // Chuẩn bị dữ liệu phản hồi
+        UserLoginResponse userResponse = new UserLoginResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getAddress(),
+                user.getImageUrl(),
+                user.getCreatedAt(),
+                user.getDescription(),
+                user.getRole().getRoleName()
+        );
+
+// Tạo phản hồi chứa accessToken, refreshToken và thông tin user
         Map<String, Object> response = new HashMap<>();
         response.put("accessToken", accessToken);
         response.put("refreshToken", refreshToken);
-        response.put("user", Map.of(
-                "id", user.getUserId(),
-                "username", user.getUsername(),
-                "name", user.getName(),
-                "email", user.getEmail(),
-                "phone", user.getPhone(),
-                "address", user.getAddress(),
-                "imageUrl", user.getImageUrl(),
-                "createdAt", user.getCreatedAt(),
-                "description", user.getDescription(),
-                "roles", user.getRole().getRoleName()
-        ));
+        response.put("user", userResponse);
 
         return response;
     }

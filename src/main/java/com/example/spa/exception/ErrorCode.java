@@ -73,6 +73,15 @@ public enum ErrorCode {
     PAYMENT_CREATED(1044, "Payment created successfully", HttpStatus.CREATED),
     PAYMENT_DELETED(1045, "Payment deleted successfully", HttpStatus.NO_CONTENT),
     PAYMENT_ALREADY_EXISTED(1046, "Payment name already existed", HttpStatus.BAD_REQUEST),
+
+    //  Appointment
+    APPOINTMENT_INVALID(1047, "Appointment not found", HttpStatus.NOT_FOUND),
+    APPOINTMENT_NOT_EXISTED(1048, "Appointment not found", HttpStatus.NOT_FOUND),
+    APPOINTMENT_UPDATED(1049, "Appointment updated successfully", HttpStatus.OK),
+    APPOINTMENT_CREATED(1050, "Appointment created successfully", HttpStatus.CREATED),
+    APPOINTMENT_DELETED(1051, "Appointment deleted successfully", HttpStatus.NO_CONTENT),
+    APPOINTMENT_ALREADY_EXISTED(1052, "Appointment name already existed", HttpStatus.BAD_REQUEST),
+    APPOINTMENT_ERROR(1053, "Appointment error", HttpStatus.BAD_REQUEST),
     ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

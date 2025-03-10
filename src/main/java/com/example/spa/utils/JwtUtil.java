@@ -25,9 +25,9 @@ public class JwtUtil {
     private long REFRESH_TOKEN_EXPIRATION;
 
     // Generate access token
-    public String generateToken(String username) {
+    public String generateToken(String email) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)) // 15 phút
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -35,9 +35,9 @@ public class JwtUtil {
     }
 
     // Generate access refresh token
-    public  String generateRefreshToken(String username) {
+    public  String generateRefreshToken(String email) {
         return  Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // 7 ngày
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -79,9 +79,9 @@ public class JwtUtil {
 
 
      // Check if JWT token is valid
-    public boolean isTokenValid(String token, String username) {
+    public boolean isTokenValid(String token, String email) {
         final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+        return (extractedUsername.equals(email) && !isTokenExpired(token));
     }
 
 
