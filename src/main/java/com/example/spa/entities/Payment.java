@@ -2,6 +2,8 @@ package com.example.spa.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -43,5 +45,12 @@ public class Payment {
 
   @Column(name = "bank_code")
   private String bankCode;
+
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
+
+  @LastModifiedDate
+  private LocalDateTime updatedAt;
 
 }

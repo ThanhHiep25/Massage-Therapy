@@ -1,6 +1,6 @@
 package com.example.spa.entities;
 
-import com.example.spa.exception.UserStatus;
+import com.example.spa.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

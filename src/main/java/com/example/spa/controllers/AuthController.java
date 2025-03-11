@@ -204,6 +204,11 @@ public class AuthController {
 
 
     @PutMapping("/{id}")
+    @Operation(summary = "Cập nhật user", description = "Cập nhật thông tin user theo id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request) {
         UserResponse updatedUser = userService.updateUser(id, request);
         return ResponseEntity.ok(updatedUser);

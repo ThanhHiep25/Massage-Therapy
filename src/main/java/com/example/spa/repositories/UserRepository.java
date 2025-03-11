@@ -1,7 +1,7 @@
 package com.example.spa.repositories;
 
 import com.example.spa.entities.User;
-import com.example.spa.exception.UserStatus;
+import com.example.spa.enums.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.stereotype.Repository;

@@ -17,5 +17,4 @@ public interface PositionService {
     List<Position> findPositionsByDepartmentId(Long departmentId);
     List<Position> importPostionFromJson(String json);
     List<Position> importPositionsFromFile(MultipartFile file) throws IOException;
-
 }

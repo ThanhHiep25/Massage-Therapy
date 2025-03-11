@@ -1,36 +1,41 @@
 package com.example.spa.dto.response;
 
-import com.example.spa.entities.Role;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class GetUserResponse {
+public class UserLoginResponse {
+    private Long id;
     private String username;
-    private String email;
     private String name;
+    private String email;
     private String phone;
     private String address;
-    private String createdAt;
     private String imageUrl;
+    private LocalDateTime createdAt;
+    private String description;
     private String role;
-    private String status;
+
 
     @Override
     public String toString() {
-        return "GetUserResponse{" +
-                "username='" + username + '\'' +
-                ", email='" + email + '\'' +
+        return "UserLoginResponse{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
                 ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", address='" + address + '\'' +
-                ", createdAt='" + createdAt + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", createdAt=" + createdAt +
+                ", description='" + description + '\'' +
                 ", role='" + role + '\'' +
-                ", status='" + status + '\'' +
                 '}';
     }
 }
