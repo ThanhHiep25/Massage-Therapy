@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-
     List<Appointment> findAllByStatus(AppointmentStatus appointmentStatus);
 
     List<Appointment> findByAppointmentDateTimeBetween(LocalDateTime localDateTime, LocalDateTime localDateTime1);

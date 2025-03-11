@@ -13,4 +13,8 @@ public interface AppointmentService {
     void deleteAppointment(Long id);
     List<Appointment> getAllAppointmentsByStatus(String status);
     List<Appointment> getAllAppointmentsByDate(String date);
+    void pendingAppointment(Long id);
+    void cancelAppointment(Long id);
+    void completeAppointment(Long id);
+    void scheduledAppointment(Long id);
 }

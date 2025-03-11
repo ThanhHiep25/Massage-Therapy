@@ -139,4 +139,36 @@ public class AppointmentServiceImpl implements AppointmentService {
                 localDate.atStartOfDay(), localDate.plusDays(1).atStartOfDay());
     }
 
+    @Override
+    public void pendingAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_INVALID));
+        appointment.setStatus(AppointmentStatus.PENDING);
+        appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public void cancelAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_INVALID));
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+        appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public void completeAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_INVALID));
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public void scheduledAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_INVALID));
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
+        appointmentRepository.save(appointment);
+    }
+
 }

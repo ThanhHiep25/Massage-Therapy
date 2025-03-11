@@ -133,4 +133,68 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAllAppointmentsByDate(date));
     }
 
+    // Chuyển trạng thái lịch hẹn sang chờ xác nhận
+    @PutMapping("/{id}/pending")
+    @Operation(summary = "Chuyển trạng thái lịch hẹn sang chờ xác nhận", description = "Chuyển trạng thái lịch hen sang cho xác nhận")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public  ResponseEntity<?> pendingAppointment(@PathVariable Long id) {
+        try {
+            appointmentService.pendingAppointment(id);
+            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_PENDING));
+        } catch (AppException e) {
+            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
+        }
+    }
+
+    // Chuyển trạng thái lịch hẹn sang đã hủy
+    @PutMapping("/{id}/cancel")
+    @Operation(summary = "Chuyển trạng thái lịch hẹn sang đã hủy", description = "Chuyển trạng thái lịch hẹn sang đã hủy")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public  ResponseEntity<?> cancelAppointment(@PathVariable Long id) {
+        try {
+            appointmentService.cancelAppointment(id);
+            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_CANCELLED));
+        } catch (AppException e) {
+            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
+        }
+    }
+
+    // Chuyển trạng thái lịch hẹn sang đã hoàn thành
+    @PutMapping("/{id}/complete")
+    @Operation(summary = "Chuyển trạng thái lịch hẹn sang đã hoàn thành", description = "Chuyển trạng thái lịch hẹn sang đã hoàn thành")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public  ResponseEntity<?> completeAppointment(@PathVariable Long id) {
+        try {
+            appointmentService.completeAppointment(id);
+            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_COMPLETED));
+        } catch (AppException e) {
+            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
+        }
+    }
+
+    // Chuyển trạng thái lịch hẹn sang đã đặt lịch
+    @PutMapping("/{id}/scheduled")
+    @Operation(summary = "Chuyển trạng thái lịch hẹn sang đã đặt lịch", description = "Chuyển trạng thái lịch hẹn sang đã đặt lịch")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public  ResponseEntity<?> scheduledAppointment(@PathVariable Long id) {
+        try {
+            appointmentService.scheduledAppointment(id);
+            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_SCHEDULED));
+        } catch (AppException e) {
+            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
+        }
+    }
+
 }

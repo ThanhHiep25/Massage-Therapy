@@ -82,6 +82,10 @@ public enum ErrorCode {
     APPOINTMENT_DELETED(1051, "Appointment deleted successfully", HttpStatus.NO_CONTENT),
     APPOINTMENT_ALREADY_EXISTED(1052, "Appointment name already existed", HttpStatus.BAD_REQUEST),
     APPOINTMENT_ERROR(1053, "Appointment error", HttpStatus.BAD_REQUEST),
+    APPOINTMENT_PENDING(1054, "Appointment pending", HttpStatus.OK),
+    APPOINTMENT_CANCELLED(1055, "Appointment cancelled", HttpStatus.OK),
+    APPOINTMENT_COMPLETED(1056, "Appointment completed", HttpStatus.OK),
+    APPOINTMENT_SCHEDULED(1057, "Appointment scheduled", HttpStatus.OK),
     ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
