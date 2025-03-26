@@ -73,12 +73,8 @@ public class StaffController {
             }
     )
     public ResponseEntity<String> deleteStaff(@PathVariable Long id) {
-        try {
             staffService.deleteStaff(id);
             return ResponseEntity.ok("Nhân viên đã được xóa.");
-        } catch (AppException e) {
-            return ResponseEntity.status(404).body("Không tìm thấy nhân viên với ID: " + id);
-        }
     }
 
     @PostMapping("/import-json")
@@ -111,5 +107,30 @@ public class StaffController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Đã xảy ra lỗi máy chủ.");
         }
+    }
+
+    @PutMapping("/{id}/activate")
+    @Operation(summary = "Kích hoạt nhân viên", description = "Kích hoạt nhân viên theo ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Kích hoạt thành công"),
+                    @ApiResponse(responseCode = "404", description = "Không tìm thấy nhân viên")
+            }
+    )
+    public ResponseEntity<String> activateStaff(@PathVariable Long id) {
+        staffService.activateStaff(id);
+        return ResponseEntity.ok("Nhân viên đã được kích hoạt.");
+    }
+
+    @PutMapping("/{id}/deactivate")
+    @Operation(summary = "Vô hiệu nhân viên", description = "Vô hiệu nhân viên theo ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Vô hiệu thành công"),
+                    @ApiResponse(responseCode = "404", description = "Không tìm thấy nhân viên")
+
+            }
+    )
+    public ResponseEntity<String> deactivateStaff(@PathVariable Long id) {
+        staffService.deactivateStaff(id);
+        return ResponseEntity.ok("Nhân viên đã được vô hiệu.");
     }
 }

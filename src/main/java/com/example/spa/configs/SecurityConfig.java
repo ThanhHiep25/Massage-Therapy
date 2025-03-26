@@ -24,19 +24,27 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // Tắt bảo vệ CSRF
+        http
+                .cors(cors -> cors.and()) // Bật CORS
+                .csrf(csrf -> csrf.disable()) // Tắt CSRF (nếu dùng cookie, có thể cần bật lại)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/api/auth/refresh-token",
+                                "/api/auth/logout",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
-                        ).permitAll() // Các endpoint công khai
-                        .anyRequest().authenticated() // Yêu cầu xác thực với các request khác
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Thêm filter JWT
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
 
 

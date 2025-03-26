@@ -18,6 +18,7 @@ public class Categories {
     private Long categoryId;
     private String categoryName;
 
+
     @Override
     public String toString() {
         return "Categories{" +

@@ -20,7 +20,7 @@ public class UserLoginResponse {
     private String imageUrl;
     private LocalDateTime createdAt;
     private String description;
-    private String role;
+    private String roles;
 
 
     @Override
@@ -35,7 +35,7 @@ public class UserLoginResponse {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", createdAt=" + createdAt +
                 ", description='" + description + '\'' +
-                ", role='" + role + '\'' +
+                ", role='" + roles + '\'' +
                 '}';
     }
 }

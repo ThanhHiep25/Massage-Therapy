@@ -14,7 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Áp dụng cho tất cả các endpoint
+        registry.addMapping("/api/**") // Áp dụng cho tất cả các endpoint
                 .allowedOrigins(frontendUrl) // Cho phép yêu cầu từ ứng dụng frontend
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Các phương thức HTTP được phép
                 .allowCredentials(true) // Cho phép gửi cookies nếu cần thiết

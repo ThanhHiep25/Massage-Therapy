@@ -1,6 +1,7 @@
 package com.example.spa.entities;
 
 
+import com.example.spa.enums.StatusBasic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -34,7 +35,7 @@ public class ServiceSpa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long service_id;
+    private Long serviceId;
 
     @Column(name = "service_name")
     private String name;
@@ -52,9 +53,9 @@ public class ServiceSpa {
     @JoinColumn(name = "category_id")
     private Categories categories;
 
-
-    @Column(name = "image_url")
-    private String imageUrl;
+    @OneToMany(mappedBy = "serviceSpa", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<ServiceSpaImage> images = new ArrayList<>();
 
     @Column(name = "service_type")
     private String service_type;
@@ -74,18 +75,26 @@ public class ServiceSpa {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusBasic status ;
 
     @Override
     public String toString() {
         return "ServiceSpa{" +
-                "service_id=" + service_id +
+                "service_id=" + serviceId +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", duration=" + duration +
                 ", categories=" + categories +
-                ", imageUrl='" + imageUrl + '\'' +
+                ", images=" + images +
                 ", service_type='" + service_type + '\'' +
+                ", staff=" + staff +
+                ", steps=" + steps +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", status=" + status +
                 '}';
     }
 }

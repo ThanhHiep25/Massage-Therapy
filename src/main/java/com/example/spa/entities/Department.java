@@ -1,8 +1,12 @@
 package com.example.spa.entities;
 
+import com.example.spa.enums.StatusBasic;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -12,15 +16,29 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Department {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long departmentId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long departmentId;
 
-  private String departmentName;
+    @Column(name = "department_name", nullable = false)
+    private String departmentName;
 
-  private String description;
+    @Column(name = "description")
+    private String description;
 
-  @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Position> positions;
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Position> positions;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private StatusBasic status = StatusBasic.ACTIVE;
 
 }

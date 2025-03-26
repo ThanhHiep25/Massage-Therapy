@@ -80,6 +80,18 @@ public class AuthController {
         }
     }
 
+    // Create user
+    @PostMapping("/create")
+    @Operation(summary = "Tạo user", description = "Tạo user mới")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"
+            ),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRegisterRequest request) {
+        UserResponse user = userService.createUser(request);
+        return ResponseEntity.ok(user);
+    }
     // Login request
     @PostMapping("/login")
     @Operation(summary = "Đăng nhập tài khoản", description = "Trả về thông tin đăng nhập")
@@ -183,7 +195,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")
     })  // This method returns a list of UserResponse objects.
-    public ResponseEntity<List<UserResponse>> getAllusers(){
+    public ResponseEntity<List<UserResponse>> getAllusers() {
         List<UserResponse> responses = userService.getAllUsers()
                 .stream()
                 .map(user -> new UserResponse((user)))
@@ -233,9 +245,22 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")
     })
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.ok("User đã bị đánh dấu là xóa.");
+    }
+
+    // Xóa mềm user
+    @DeleteMapping("block/{id}")
+    @Operation(summary = "Xóa user", description = "Xóa user theo id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> blockUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("User đã bị đánh dấu là xóa.");
     }
+
 
     // Vô hiệu hóa user
     @PutMapping("/{id}/deactivate")

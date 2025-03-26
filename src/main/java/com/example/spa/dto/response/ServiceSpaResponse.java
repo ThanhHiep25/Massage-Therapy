@@ -1,6 +1,7 @@
 package com.example.spa.dto.response;
 
 import com.example.spa.entities.ServiceSpa;
+import com.example.spa.entities.ServiceSpaImage;
 import com.example.spa.entities.ServiceStep;
 import lombok.*;
 
@@ -19,27 +20,27 @@ public class ServiceSpaResponse {
     private Double price;
     private Integer duration;
     private Long categoryId;
-    private String imageUrl;
+    private List<String> images; // Lưu danh sách URL ảnh thay vì đối tượng ServiceSpaImage
     private String serviceType;
-    private List<ServiceStepDTO> steps; // Thay vì trả về ServiceStep, dùng DTO
+    private List<ServiceStepDTO> steps;
 
     public ServiceSpaResponse(ServiceSpa serviceSpa, List<ServiceStep> steps) {
-        this.id = serviceSpa.getService_id();
+        this.id = serviceSpa.getServiceId();
         this.name = serviceSpa.getName();
         this.description = serviceSpa.getDescription();
         this.price = serviceSpa.getPrice();
         this.duration = serviceSpa.getDuration();
+        this.categoryId = (serviceSpa.getCategories() != null) ? serviceSpa.getCategories().getCategoryId() : null;
 
-        // Lấy categoryId từ category của ServiceSpa
-        this.categoryId = serviceSpa.getCategories() != null ? serviceSpa.getCategories().getCategoryId() : null;
+        // Chuyển danh sách ServiceSpaImage thành danh sách URL ảnh
+        this.images = serviceSpa.getImages().stream()
+                .map(ServiceSpaImage::getImageUrl) // Chỉ lấy URL từ đối tượng ServiceSpaImage
+                .collect(Collectors.toList());
 
-        // Nếu bạn cần mã hóa Base64 cho imageUrl, bạn có thể làm điều này
-        this.imageUrl = serviceSpa.getImageUrl(); // Nếu cần Base64, có thể thêm mã hóa
         this.serviceType = serviceSpa.getService_type();
-
-        // Dùng DTO cho các bước thay vì trả về ServiceStep trực tiếp
         this.steps = steps.stream()
-                .map(ServiceStepDTO::new) // Áp dụng DTO cho mỗi bước
+                .map(ServiceStepDTO::new)
                 .collect(Collectors.toList());
     }
 }
+

@@ -3,8 +3,10 @@ package com.example.spa.servicesImpl;
 import com.example.spa.dto.request.StaffRequest;
 import com.example.spa.entities.Position;
 import com.example.spa.entities.Staff;
+import com.example.spa.enums.StatusBasic;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
+import com.example.spa.repositories.AppointmentRepository;
 import com.example.spa.repositories.PositionRepository;
 import com.example.spa.repositories.StaffRepository;
 import com.example.spa.services.StaffService;
@@ -29,6 +31,7 @@ public class StaffServiceImpl implements StaffService {
 
     private final StaffRepository staffRepository;
     private final PositionRepository positionRepository;
+    private final AppointmentRepository appointmentRepository;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -60,7 +63,7 @@ public class StaffServiceImpl implements StaffService {
         existingStaff.setAddress(staffRequest.getAddress());
         existingStaff.setImageUrl(staffRequest.getImageUrl());
         existingStaff.setDescription(staffRequest.getDescription());
-        existingStaff.setStatus(staffRequest.getStatus());
+
 
         if (staffRequest.getStartDate() != null && !staffRequest.getStartDate().isEmpty()) {
             existingStaff.setStartDate(LocalDate.parse(staffRequest.getStartDate(), DateTimeFormatter.ISO_DATE));
@@ -76,8 +79,12 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public void deleteStaff(Long id) {
         if (!staffRepository.existsById(id)) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
+        if (appointmentRepository.existsByStaffStaffId(id)) {
+            throw new AppException(ErrorCode.STAFF_ALREADY_EXISTED);
+        }
+
         staffRepository.deleteById(id);
     }
 
@@ -85,7 +92,8 @@ public class StaffServiceImpl implements StaffService {
     @Transactional
     public List<Staff> importStaffsFromJson(String json) {
         try {
-            List<StaffRequest> staffRequests = objectMapper.readValue(json, new TypeReference<>() {});
+            List<StaffRequest> staffRequests = objectMapper.readValue(json, new TypeReference<>() {
+            });
 
             // Lấy tất cả vị trí để tránh truy vấn nhiều lần
             List<Long> positionIds = staffRequests.stream()
@@ -120,6 +128,28 @@ public class StaffServiceImpl implements StaffService {
             return importStaffsFromJson(json);
         } catch (IOException e) {
             throw new AppException(ErrorCode.INVALID_KEY);
+        }
+    }
+
+    @Override
+    public void activateStaff(Long id) {
+        try {
+            Staff staff = staffRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            staff.setStatus(StatusBasic.ACTIVE);
+            staffRepository.save(staff);
+        } catch (AppException e) {
+            throw new AppException(ErrorCode.STAFF_NOT_EXISTED);
+        }
+    }
+
+    @Override
+    public void deactivateStaff(Long id) {
+        try {
+            Staff staff = staffRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            staff.setStatus(StatusBasic.DEACTIVATED);
+            staffRepository.save(staff);
+        } catch (AppException e) {
+            throw new AppException(ErrorCode.STAFF_NOT_EXISTED);
         }
     }
 }

@@ -50,21 +50,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse register(UserRegisterRequest user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new AppException(ErrorCode.NAME_ALREADY_EXISTED);
-        }
+
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTED);
+        }
+
+        // Lấy role từ database thay vì gán trực tiếp từ request
+        Role role = roleService.findByName(user.getRole() != null ? user.getRole().getRoleName() : "customer");
+        if (role == null) {
+            throw new RuntimeException("Role not found.");
         }
 
         // Tạo OTP và gửi qua email
         String otp = otpService.generateOtp();
         otpService.sendOtpEmail(user.getEmail(), otp);
 
-        // Lưu thông tin đăng ký tạm thời vào cơ sở dữ liệu hoặc bộ nhớ
+        // Gán lại role lấy từ database
+        user.setRole(role);
+
+        // Lưu thông tin đăng ký tạm thời
         otpService.savePendingUser(user);
 
-        return new UserResponse().builder()
+        return UserResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .phone(user.getPhone())
@@ -72,7 +79,46 @@ public class UserServiceImpl implements UserService {
                 .imageUrl(user.getImageUrl())
                 .description(user.getDescription())
                 .address(user.getAddress())
-                .role(user.getRole().getRoleName())
+                .role(role.getRoleName()) // ✅ Sử dụng role đã lấy từ DB
+                .build();
+    }
+
+    @Override
+    public UserResponse createUser(UserRegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTED);
+        }
+
+        // Lấy role từ database thay vì gán trực tiếp từ request
+        Role role = roleService.findByName(request.getRole() != null ? request.getRole().getRoleName() : "customer");
+        if (role == null) {
+            throw new RuntimeException("Role not found.");
+        }
+
+        // Lưu người dùng vào cơ sở dữ liệu
+        User userToSave = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .name(request.getName())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .address(request.getAddress())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
+                .imageUrl(request.getImageUrl())
+                .description(request.getDescription())
+                .status(UserStatus.ACTIVE) // Mặc định là ACTIVE
+                .role(role) // ✅ Gán Role lấy từ database
+                .build();
+
+        userRepository.save(userToSave);
+
+        return UserResponse.builder()
+                .username(userToSave.getUsername())
+                .email(userToSave.getEmail())
+                .phone(userToSave.getPhone())
+                .name(userToSave.getName())
+                .role(role.getRoleName()) // ✅ Lấy role từ DB, tránh lỗi detached entity
                 .build();
     }
 
@@ -90,17 +136,13 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("No pending registration found for this email");
         }
 
-        // Kiểm tra xem role có hợp lệ hay không trước khi lưu vào cơ sở dữ liệu
-        if (pendingUser.getRole() == null) {
-            // Tạo vai trò mặc định nếu không có
-            Role defaultRole = roleService.findByName("superadmin");
-            if (defaultRole == null) {
-                throw new RuntimeException("Role 'superadmin' not found.");
-            }
-            pendingUser.setRole(defaultRole);
+        // Lấy Role từ database thay vì gán trực tiếp từ pendingUser
+        Role role = roleService.findByName(pendingUser.getRole() != null ? pendingUser.getRole().getRoleName() : "customer");
+        if (role == null) {
+            throw new RuntimeException("Role not found.");
         }
 
-        // Lưu người dùng vào cơ sở dữ liệu, chỉ sau khi OTP xác thực thành công
+        // Lưu người dùng vào cơ sở dữ liệu
         User userToSave = User.builder()
                 .username(pendingUser.getUsername())
                 .email(pendingUser.getEmail())
@@ -113,21 +155,23 @@ public class UserServiceImpl implements UserService {
                 .imageUrl(pendingUser.getImageUrl())
                 .description(pendingUser.getDescription())
                 .status(UserStatus.ACTIVE) // Mặc định là ACTIVE
-                .role(pendingUser.getRole()) // Đảm bảo role được gán chính xác
+                .role(role) // ✅ Gán Role lấy từ database
                 .build();
+
         userRepository.save(userToSave);
 
         // Xóa thông tin tạm thời sau khi đăng ký thành công
         otpService.clearPendingUser(email);
 
-        return new UserResponse().builder()
+        return UserResponse.builder()
                 .username(userToSave.getUsername())
                 .email(userToSave.getEmail())
                 .phone(userToSave.getPhone())
                 .name(userToSave.getName())
-                .role(userToSave.getRole() != null ? userToSave.getRole().getRoleName() : "No Role Assigned")
+                .role(role.getRoleName()) // ✅ Lấy role từ DB, tránh lỗi detached entity
                 .build();
     }
+
 
 
     @Override
@@ -274,6 +318,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return UserResponse.builder()
+                .id(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .phone(user.getPhone())
@@ -282,6 +327,7 @@ public class UserServiceImpl implements UserService {
                 .imageUrl(user.getImageUrl())
                 .description(user.getDescription())
                 .role(user.getRole().getRoleName())
+                .status(user.getStatus().name())
                 .build();
     }
 

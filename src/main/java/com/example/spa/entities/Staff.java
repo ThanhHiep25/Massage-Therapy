@@ -1,6 +1,7 @@
 package com.example.spa.entities;
 
 
+import com.example.spa.enums.StatusBasic;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -55,7 +56,8 @@ public class Staff {
 
 
     @Column(name = "status")
-    private String status; // "Active", "Inactive", v.v.
+    @Enumerated(EnumType.STRING)
+    private StatusBasic status = StatusBasic.ACTIVE; // "Active", "Inactive", v.v.
 
 
     @Override

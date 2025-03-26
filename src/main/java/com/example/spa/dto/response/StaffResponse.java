@@ -31,7 +31,7 @@ public class StaffResponse {
         this.imageUrl = updateStaff.getImageUrl();
         this.description = updateStaff.getDescription();
         this.startDate = updateStaff.getStartDate().toString();
-        this.status = updateStaff.getStatus();
+        this.status = updateStaff.getStatus().name();
     }
 
 }

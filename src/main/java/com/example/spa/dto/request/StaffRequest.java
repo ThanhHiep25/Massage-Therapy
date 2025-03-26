@@ -19,7 +19,6 @@ public class StaffRequest {
     private String imageUrl;
     private String description;
     private String startDate;
-    private String status;
 
     public Staff toPartialStaff(Position position){
         Staff staff = new Staff();
@@ -34,7 +33,6 @@ public class StaffRequest {
         if (startDate != null && !startDate.isEmpty()) {
             staff.setStartDate(LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE));
         }
-        staff.setStatus(status);
         return staff;
     }
 }

@@ -1,9 +1,13 @@
 package com.example.spa.dto.request;
 
+import com.example.spa.entities.Categories;
 import com.example.spa.entities.ServiceSpa;
 import com.example.spa.entities.ServiceStep;
+import com.example.spa.enums.StatusBasic;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Setter
@@ -19,16 +23,23 @@ public class ServiceSpaRequest {
     private Long categoryId;  // ID của Categories
     private String serviceType;
     private List<ServiceStep> steps;
-    private String imageUrl; // Nhận image từ FE, không lấy từ Cloudinary
+    private List<String> imageUrls;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String status;
 
-    public ServiceSpa toServiceSpa() {
+    public ServiceSpa toServiceSpa(Categories categories) {
         ServiceSpa serviceSpa = new ServiceSpa();
         serviceSpa.setName(this.name);
         serviceSpa.setDescription(this.description);
         serviceSpa.setPrice(this.price);
         serviceSpa.setDuration(this.duration);
+        serviceSpa.setCategories(categories);
         serviceSpa.setService_type(this.serviceType);
-        serviceSpa.setImageUrl(this.imageUrl);  // Lấy ảnh từ request FE
+        serviceSpa.setCreatedAt(LocalDateTime.now());
+        serviceSpa.setUpdatedAt(LocalDateTime.now());
+        serviceSpa.setStatus(StatusBasic.ACTIVE);
         return serviceSpa;
     }
+
 }

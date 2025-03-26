@@ -20,7 +20,7 @@ public class UserRequest {
     private String description;
     private String phone;
     private String imageUrl;
-    private Role role;
+
 
     public User toPartialUser() {
         User user = new User();
@@ -45,7 +45,6 @@ public class UserRequest {
                 ", description='" + description + '\'' +
                 ", phone='" + phone + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", role=" + role +
                 '}';
     }
 }

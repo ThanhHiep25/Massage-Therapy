@@ -17,6 +17,7 @@ import java.util.Map;
 
 public interface UserService {
     UserResponse register(UserRegisterRequest user);
+    UserResponse createUser(UserRegisterRequest request);
     Map<String, Object> login(UserLoginRequest request);
     String refreshToken(String refreshToken);
     GetUserResponse getUserById(Long id);

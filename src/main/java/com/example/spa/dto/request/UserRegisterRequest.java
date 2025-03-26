@@ -22,6 +22,7 @@ public class UserRegisterRequest {
     private String phone;
     private String imageUrl;
     private Role role;
+
     public LocalDateTime getCreatedAt() {
         return LocalDateTime.now();
     }
