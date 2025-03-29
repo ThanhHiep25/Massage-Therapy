@@ -124,7 +124,8 @@ public class AuthController {
             // Xử lý lỗi đăng nhập
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "Invalid credentials",
-                    "message", e.getMessage()
+                    "message", e.getMessage(),
+                    "code", e.hashCode()
             ));
         }
     }

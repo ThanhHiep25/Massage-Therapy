@@ -14,6 +14,7 @@ import com.example.spa.repositories.ServiceSpaRepository;
 import com.example.spa.repositories.ServiceStepRepository;
 import com.example.spa.services.ServiceSpaService;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,36 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
     private final ServiceSpaImageRepository serviceSpaImageRepository;
     private final ObjectMapper objectMapper;
 
+//    @Override
+//    @Transactional
+//    public ServiceSpa createServiceSpa(ServiceSpaRequest serviceSpaRequest, List<ServiceStep> steps) {
+//        Categories category = categoryRepository.findById(serviceSpaRequest.getCategoryId())
+//                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+//
+//        ServiceSpa newService = serviceSpaRequest.toServiceSpa(category);
+//        ServiceSpa savedService = serviceSpaRepository.save(newService);
+//
+//        // Lưu danh sách ServiceStep
+//        for (ServiceStep step : steps) {
+//            step.setServiceSpa(savedService);
+//        }
+//        serviceStepRepository.saveAll(steps);
+//
+//        // Lưu danh sách hình ảnh
+//        if (serviceSpaRequest.getImageUrls() != null && !serviceSpaRequest.getImageUrls().isEmpty()) {
+//            List<ServiceSpaImage> images = serviceSpaRequest.getImageUrls().stream()
+//                    .map(url -> ServiceSpaImage.builder()
+//                            .imageUrl(url)
+//                            .serviceSpa(savedService)
+//                            .build())
+//                    .toList();
+//            serviceSpaImageRepository.saveAll(images);
+//            savedService.setImages(images);
+//        }
+//
+//        return savedService;
+//    }
+
     @Override
     @Transactional
     public ServiceSpa createServiceSpa(ServiceSpaRequest serviceSpaRequest, List<ServiceStep> steps) {
@@ -49,13 +80,14 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
         ServiceSpa newService = serviceSpaRequest.toServiceSpa(category);
         ServiceSpa savedService = serviceSpaRepository.save(newService);
 
-        // Lưu danh sách ServiceStep
-        for (ServiceStep step : steps) {
-            step.setServiceSpa(savedService);
+        // ✅ Liên kết danh sách ServiceStep với ServiceSpa
+        if (steps != null && !steps.isEmpty()) {
+            steps.forEach(step -> step.setServiceSpa(savedService));
+            savedService.getSteps().addAll(steps); // Gán steps vào ServiceSpa
+            serviceStepRepository.saveAll(steps);
         }
-        serviceStepRepository.saveAll(steps);
 
-        // Lưu danh sách hình ảnh
+        // ✅ Lưu danh sách hình ảnh nếu có
         if (serviceSpaRequest.getImageUrls() != null && !serviceSpaRequest.getImageUrls().isEmpty()) {
             List<ServiceSpaImage> images = serviceSpaRequest.getImageUrls().stream()
                     .map(url -> ServiceSpaImage.builder()
@@ -64,7 +96,7 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
                             .build())
                     .toList();
             serviceSpaImageRepository.saveAll(images);
-            savedService.setImages(images);
+            savedService.getImages().addAll(images); // Gán images vào ServiceSpa
         }
 
         return savedService;
@@ -226,7 +258,7 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
         try {
             ServiceSpa serviceSpa = serviceSpaRepository.findById(id).orElseThrow(() ->
                     new AppException(ErrorCode.SERVICE_NOT_FOUND));
-            serviceSpa.setStatus(StatusBasic.ACTIVE);
+            serviceSpa.setStatus(StatusBasic.ACTIVATE);
             serviceSpaRepository.save(serviceSpa);
         } catch (Exception e) {
             throw new AppException(ErrorCode.SERVICE_INVALID);

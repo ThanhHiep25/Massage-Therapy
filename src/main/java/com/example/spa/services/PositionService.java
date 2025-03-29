@@ -14,7 +14,6 @@ public interface PositionService {
     Position updatePosition(Long id, Position position);
     boolean positionExists(Long id);
     Position findByName(String name);
-    List<Position> findPositionsByDepartmentId(Long departmentId);
     List<Position> importPostionFromJson(String json);
     List<Position> importPositionsFromFile(MultipartFile file) throws IOException;
 }

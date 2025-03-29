@@ -24,16 +24,13 @@ public class Position {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne
-    private Department department;
-
     @Override
     public String toString() {
         return "Position{" +
                 "positionId=" + positionId +
                 ", positionName='" + positionName + '\'' +
                 ", description='" + description + '\'' +
-                ", department=" + department +
+
                 '}';
     }
 }

@@ -28,7 +28,11 @@ public class DataRoleInit implements CommandLineRunner {
             customerRole.setRoleName("customer");
             roleRepository.save(customerRole);
 
-            System.out.println("Roles initialized: admin, superadmin, customer");
+            Role staffRole = new Role();
+            staffRole.setRoleName("staff");
+            roleRepository.save(staffRole);
+
+            System.out.println("Roles initialized: admin, superadmin, customer, staff");
         }
     }
 }

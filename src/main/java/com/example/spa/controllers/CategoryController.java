@@ -44,7 +44,7 @@ public class CategoryController {
     }
 
     // Lấy tất cả danh mục
-    @GetMapping("/")
+    @GetMapping
     @Operation(summary = "Lấy tất cả danh mục", description = "Trả về danh sách tất cả danh mục")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Thành công")

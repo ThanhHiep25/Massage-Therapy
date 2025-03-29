@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
                 .updatedAt(request.getUpdatedAt())
                 .imageUrl(request.getImageUrl())
                 .description(request.getDescription())
-                .status(UserStatus.ACTIVE) // Mặc định là ACTIVE
+                .status(UserStatus.ACTIVATE) // Mặc định là ACTIVE
                 .role(role) // ✅ Gán Role lấy từ database
                 .build();
 
@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
                 .updatedAt(pendingUser.getUpdatedAt())
                 .imageUrl(pendingUser.getImageUrl())
                 .description(pendingUser.getDescription())
-                .status(UserStatus.ACTIVE) // Mặc định là ACTIVE
+                .status(UserStatus.ACTIVATE) // Mặc định là ACTIVE
                 .role(role) // ✅ Gán Role lấy từ database
                 .build();
 
@@ -176,12 +176,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Object> login(UserLoginRequest request) {
-//        User user = userRepository.findByUsername(request.getUsername())
-//                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_INVALID));
-//
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getStatus() == UserStatus.DEACTIVATED){
+            throw new AppException(ErrorCode.USER_BLOCKED);
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_INVALID);
@@ -190,23 +191,6 @@ public class UserServiceImpl implements UserService {
         // Tạo Access Token và Refresh Token
         String accessToken = jwtUtil.generateToken(request.getEmail());
         String refreshToken = jwtUtil.generateRefreshToken(request.getEmail());
-
-//        // Chuẩn bị dữ liệu phản hồi
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("accessToken", accessToken);
-//        response.put("refreshToken", refreshToken);
-//        response.put("user", Map.of(
-//                "id", user.getUserId(),
-//                "username", user.getUsername(),
-//                "name", user.getName(),
-//                "email", user.getEmail(),
-//                "phone", user.getPhone(),
-//                "address", user.getAddress(),
-//                "imageUrl", user.getImageUrl(),
-//                "createdAt", user.getCreatedAt(),
-//                "description", user.getDescription(),
-//                "roles", user.getRole().getRoleName()
-//        ));
 
         // Chuẩn bị dữ liệu phản hồi
         UserLoginResponse userResponse = new UserLoginResponse(
@@ -424,7 +408,7 @@ public class UserServiceImpl implements UserService {
     public void activateUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        user.setStatus(UserStatus.ACTIVE); // Kích hoạt lại user
+        user.setStatus(UserStatus.ACTIVATE); // Kích hoạt lại user
         userRepository.save(user);
     }
 

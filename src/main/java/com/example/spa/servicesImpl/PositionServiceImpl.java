@@ -66,10 +66,7 @@ public class PositionServiceImpl implements PositionService {
         return positionRepository.findByPositionName(name).orElse(null);
     }
 
-    @Override
-    public List<Position> findPositionsByDepartmentId(Long departmentId) {
-        return positionRepository.findByDepartment_DepartmentId(departmentId);
-    }
+
 
     @Override
     public List<Position> importPostionFromJson(String json) {

@@ -57,7 +57,7 @@ public class User {
 
     @Enumerated(EnumType.STRING) // Lưu enum dưới dạng chuỗi trong DB
     @Column(name = "status", nullable = false)
-    private UserStatus status = UserStatus.ACTIVE; // Mặc định là ACTIVE
+    private UserStatus status = UserStatus.ACTIVATE; // Mặc định là ACTIVE
 
     @Override
     public String toString() {

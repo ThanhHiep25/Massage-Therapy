@@ -4,17 +4,18 @@ import com.example.spa.dto.request.ServiceSpaRequest;
 import com.example.spa.dto.response.ServiceSpaResponse;
 import com.example.spa.entities.ServiceSpa;
 import com.example.spa.entities.ServiceStep;
+import com.example.spa.exception.AppException;
+import com.example.spa.exception.ErrorCode;
 import com.example.spa.services.ServiceSpaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,10 +33,17 @@ public class ServiceSpaController {
             @ApiResponse(responseCode = "200", description = "Thành công"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
-    public ResponseEntity<ServiceSpa> createServiceSpa(@RequestBody ServiceSpaRequest serviceSpaRequest) {
-        List<ServiceStep> steps = serviceSpaRequest.getSteps(); // Lấy danh sách bước từ request
-        ServiceSpa createdService = serviceSpaService.createServiceSpa(serviceSpaRequest, steps);
-        return ResponseEntity.ok(createdService);
+    public ResponseEntity<?> createServiceSpa(@RequestBody ServiceSpaRequest serviceSpaRequest) {
+      try {
+          List<ServiceStep> steps = serviceSpaRequest.getSteps(); // Lấy danh sách bước từ request
+          ServiceSpa createdService = serviceSpaService.createServiceSpa(serviceSpaRequest, steps);
+          return ResponseEntity.ok(createdService);
+      }catch (AppException e){
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                  "errorCode", "SERVICE_CREATION_FAILED",
+                  "message", "Có lỗi xảy ra khi tạo dịch vụ"
+          ));
+      }
     }
 
     @GetMapping("/{id}")
@@ -69,11 +77,17 @@ public class ServiceSpaController {
             @ApiResponse(responseCode = "200", description = "Thành công"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
-    public ResponseEntity<ServiceSpaResponse> updateServiceSpa(@PathVariable Long id,
+    public ResponseEntity<?> updateServiceSpa(@PathVariable Long id,
                                                                @RequestBody ServiceSpaRequest request) {
-        List<ServiceStep> steps = request.getSteps(); // Lấy danh sách bước từ request
-        ServiceSpa updatedService = serviceSpaService.updateServiceSpa(id, request, steps);
-        return ResponseEntity.ok(new ServiceSpaResponse(updatedService, steps));
+
+        try {
+            List<ServiceStep> steps = request.getSteps(); // Lấy danh sách bước từ request
+            ServiceSpa updatedService = serviceSpaService.updateServiceSpa(id, request, steps);
+            return ResponseEntity.ok(new AppException(ErrorCode.SERVICE_UPDATED));
+        }catch (AppException e){
+            return  ResponseEntity.status(400).body(new AppException(ErrorCode.SERVICE_ERROR));
+        }
+
     }
 
     @DeleteMapping("/{id}")
@@ -113,13 +127,6 @@ public class ServiceSpaController {
         }
 
         return ResponseEntity.ok(result);
-    }
-
-
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<String> handleIOException(IOException e) {
-        return ResponseEntity.internalServerError()
-                .body("Error uploading image to Cloudinary: " + e.getMessage());
     }
 
     @DeleteMapping

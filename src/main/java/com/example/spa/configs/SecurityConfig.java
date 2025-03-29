@@ -11,9 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Configuration
 @EnableMethodSecurity // Cho phép sử dụng @PreAuthorize, @PostAuthorize
+@CrossOrigin(origins = "http://192.168.1.177:5173", allowCredentials = "true")
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -29,7 +31,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Tắt CSRF (nếu dùng cookie, có thể cần bật lại)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/api/auth/register",
+                                "/api/**",
                                 "/api/auth/login",
                                 "/api/auth/refresh-token",
                                 "/api/auth/logout",

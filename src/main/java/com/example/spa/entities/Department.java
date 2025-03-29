@@ -33,12 +33,8 @@ public class Department {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Position> positions;
-
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private StatusBasic status = StatusBasic.ACTIVE;
+    private StatusBasic status = StatusBasic.ACTIVATE;
 
 }

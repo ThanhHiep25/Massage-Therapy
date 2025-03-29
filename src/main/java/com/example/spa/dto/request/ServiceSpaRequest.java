@@ -38,7 +38,7 @@ public class ServiceSpaRequest {
         serviceSpa.setService_type(this.serviceType);
         serviceSpa.setCreatedAt(LocalDateTime.now());
         serviceSpa.setUpdatedAt(LocalDateTime.now());
-        serviceSpa.setStatus(StatusBasic.ACTIVE);
+        serviceSpa.setStatus(StatusBasic.ACTIVATE);
         return serviceSpa;
     }
 

@@ -47,7 +47,7 @@ dependencies {
 	implementation 'com.cloudinary:cloudinary-http44:1.25.0'
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.3.5'
 
-
+	implementation("mysql:mysql-connector-java:8.0.33")
 
 	//implementation 'org.mapstruct:mapstruct-processor:1.6.3'
     //implementation 'org.mapstruct:mapstruct:1.6.3'

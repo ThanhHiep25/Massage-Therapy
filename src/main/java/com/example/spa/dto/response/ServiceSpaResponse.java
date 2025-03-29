@@ -23,6 +23,7 @@ public class ServiceSpaResponse {
     private List<String> images; // Lưu danh sách URL ảnh thay vì đối tượng ServiceSpaImage
     private String serviceType;
     private List<ServiceStepDTO> steps;
+    private String status;
 
     public ServiceSpaResponse(ServiceSpa serviceSpa, List<ServiceStep> steps) {
         this.id = serviceSpa.getServiceId();
@@ -41,6 +42,7 @@ public class ServiceSpaResponse {
         this.steps = steps.stream()
                 .map(ServiceStepDTO::new)
                 .collect(Collectors.toList());
+        this.status = serviceSpa.getStatus().name(); // Thêm trư��ng status vào DTO
     }
 }
 

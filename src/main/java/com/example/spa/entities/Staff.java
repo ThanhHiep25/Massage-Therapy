@@ -46,6 +46,9 @@ public class Staff {
     @Column(name = "start_date")
     private LocalDate startDate;
 
+    @ManyToOne
+    private Department department;
+
     @ManyToMany
     @JoinTable(
             name = "staff_service",
@@ -57,7 +60,7 @@ public class Staff {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private StatusBasic status = StatusBasic.ACTIVE; // "Active", "Inactive", v.v.
+    private StatusBasic status = StatusBasic.ACTIVATE; // "Active", "Inactive", v.v.
 
 
     @Override

@@ -23,6 +23,9 @@ public enum ErrorCode {
     EMAIL_NOT_FOUND(1012, "Email not found", HttpStatus.NOT_FOUND),
     PASSWORD_INVALID(1013, "Invalid username or password!", HttpStatus.BAD_REQUEST),
     ADD_USER_VALID(200, "Add user successfully", HttpStatus.CREATED),
+    USER_ACTIVATED(1111, "Activated", HttpStatus.MULTI_STATUS),
+    USER_DELETED(1111, "Deleted", HttpStatus.MULTI_STATUS),
+    USER_BLOCKED(1111, "Blocked", HttpStatus.MULTI_STATUS),
     
     //Token
     TOKEN_INVALID(1111, "Token invalid verify", HttpStatus.UNAUTHORIZED),
@@ -94,9 +97,10 @@ public enum ErrorCode {
     SERVICE_INVALID(1001, "Service  error", HttpStatus.NOT_FOUND),
     SERVICE_NOT_FOUND(404, "Service not found", HttpStatus.NOT_FOUND),
     SERVICE_UPDATED(1000, "Service updated successfully", HttpStatus.OK),
-    SERVICE_CREATED(1000, "Service created successfully", HttpStatus.CREATED),
+    SERVICE_CREATED(1000, "Service created successfully", HttpStatus.OK),
     SERVICE_DELETED(1000, "Service deleted successfully", HttpStatus.NO_CONTENT),
     SERVICE_ALREADY_EXISTED(1006, "Service name already existed", HttpStatus.BAD_REQUEST),
+    SERVICE_ERROR(405, "Service error", HttpStatus.BAD_REQUEST)
     ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

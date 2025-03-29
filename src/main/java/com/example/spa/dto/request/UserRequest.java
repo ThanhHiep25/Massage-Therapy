@@ -30,7 +30,6 @@ public class UserRequest {
         user.setAddress(this.address);
         user.setDescription(this.description);
         user.setImageUrl(this.imageUrl);
-        user.setStatus(UserStatus.ACTIVE);
         return user;
     }
 

@@ -135,7 +135,7 @@ public class StaffServiceImpl implements StaffService {
     public void activateStaff(Long id) {
         try {
             Staff staff = staffRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-            staff.setStatus(StatusBasic.ACTIVE);
+            staff.setStatus(StatusBasic.ACTIVATE);
             staffRepository.save(staff);
         } catch (AppException e) {
             throw new AppException(ErrorCode.STAFF_NOT_EXISTED);
