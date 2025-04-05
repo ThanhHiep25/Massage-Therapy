@@ -20,7 +20,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     // Tạo danh mục mới
-    @PostMapping("/create")
+    @PostMapping
     @Operation(summary = "Tạo danh mục mới", description = "Thêm danh mục mới vào hệ thống")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tạo thành công"),

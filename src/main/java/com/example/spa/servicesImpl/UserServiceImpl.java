@@ -180,9 +180,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        if (user.getStatus() == UserStatus.DEACTIVATED){
+        if (user.getStatus() == UserStatus.DEACTIVATED) {
+            System.out.println("User Status: " + user.getStatus()); // Debug
             throw new AppException(ErrorCode.USER_BLOCKED);
         }
+
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_INVALID);
@@ -391,10 +393,10 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public void deleteUser(Long id) {
+    public void blockUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        user.setStatus(UserStatus.DELETED); // Chỉ đánh dấu là đã "xóa"
+        user.setStatus(UserStatus.BLOCKED); // Chỉ đánh dấu là đã "xóa"
         userRepository.save(user);
     }
 

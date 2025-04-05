@@ -1,6 +1,7 @@
 package com.example.spa.servicesImpl;
 
 import com.example.spa.dto.request.StaffRequest;
+import com.example.spa.dto.response.StaffResponse;
 import com.example.spa.entities.Position;
 import com.example.spa.entities.Staff;
 import com.example.spa.enums.StatusBasic;
@@ -35,8 +36,11 @@ public class StaffServiceImpl implements StaffService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public List<Staff> getAllStaffs() {
-        return staffRepository.findAll();
+    public List<StaffResponse> getAllStaffs() {
+        return staffRepository.findAll()
+                .stream()
+                .map(StaffResponse::new) // dùng constructor để map từ entity -> DTO
+                .collect(Collectors.toList());
     }
 
     @Override

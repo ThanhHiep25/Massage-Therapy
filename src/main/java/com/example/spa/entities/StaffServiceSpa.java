@@ -1,5 +1,7 @@
 package com.example.spa.entities;
 
+import com.example.spa.enums.StaffServiceStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,15 +21,24 @@ public class StaffServiceSpa {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "staff_id", nullable = false)
     private Staff staff;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "service_id", nullable = false)
     private ServiceSpa serviceSpa;
 
     @Column(name = "assigned_date")
     private LocalDate assignedDate; // Ngày nhân viên được giao dịch vụ
+
+    @Column(name = "note")
+    private String note;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private StaffServiceStatus status; // "Pending", "Completed", "Cancelled"
 
     @Override
     public String toString() {
@@ -36,6 +47,8 @@ public class StaffServiceSpa {
                 ", staff=" + staff.getName() +
                 ", service=" + serviceSpa.getName() +
                 ", assignedDate=" + assignedDate +
+                ", note='" + note + '\'' +
+                ", status=" + status +
                 '}';
     }
 }

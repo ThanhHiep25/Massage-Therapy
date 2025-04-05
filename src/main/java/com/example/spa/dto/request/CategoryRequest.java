@@ -7,13 +7,15 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 public class CategoryRequest {
-    private String name;
+
+    private String categoryName;
 
     @Override
     public String toString() {
         return "CategoryRequest{" +
-                ", name='" + name + '\'' +
+                ", name='" +categoryName + '\'' +
                 '}';
     }
 }

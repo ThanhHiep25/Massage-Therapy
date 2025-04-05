@@ -24,13 +24,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public Categories createCategory(CategoryRequest category) {
         // Kiểm tra xem danh mục đã tồn tại chưa (theo tên)
-        if (categoryRepository.existsByCategoryName(category.getName())) {
+        if (categoryRepository.existsByCategoryName(category.getCategoryName())) {
             throw new AppException(ErrorCode.CATEGORY_NOT_EXISTED);
         }
 
         // Tạo danh mục mới
         Categories newCategory = new Categories();
-        newCategory.setCategoryName(category.getName());
+        newCategory.setCategoryName(category.getCategoryName());
         return categoryRepository.save(newCategory);
     }
 
@@ -44,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Categories updateCategory(Long id, CategoryRequest request) {
         try {
             Categories category = categoryRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-            category.setCategoryName(request.getName());
+            category.setCategoryName(request.getCategoryName());
             return categoryRepository.save(category);
         } catch (Exception e) {
             throw new AppException(ErrorCode.CATEGORY_INVALID);

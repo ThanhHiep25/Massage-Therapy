@@ -1,6 +1,7 @@
 package com.example.spa.controllers;
 
 import com.example.spa.dto.request.StaffRequest;
+import com.example.spa.dto.response.StaffResponse;
 import com.example.spa.entities.Staff;
 import com.example.spa.exception.AppException;
 import com.example.spa.services.StaffService;
@@ -27,7 +28,7 @@ public class StaffController {
                     @ApiResponse(responseCode = "500", description = "Lỗi máy chủ")
             }
     )
-    public ResponseEntity<List<Staff>> getAllStaffs() {
+    public ResponseEntity<List<StaffResponse>> getAllStaffs() {
         return ResponseEntity.ok(staffService.getAllStaffs());
     }
 

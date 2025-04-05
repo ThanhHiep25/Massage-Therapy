@@ -77,6 +77,10 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
         Categories category = categoryRepository.findById(serviceSpaRequest.getCategoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
+        if(serviceSpaRepository.existsByName(serviceSpaRequest.getName())){
+            throw new AppException(ErrorCode.SERVICE_ALREADY_EXISTED);
+        }
+
         ServiceSpa newService = serviceSpaRequest.toServiceSpa(category);
         ServiceSpa savedService = serviceSpaRepository.save(newService);
 
@@ -222,7 +226,6 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
 
         return response;
     }
-
 
 
 

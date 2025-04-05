@@ -53,12 +53,17 @@ public class AuthController {
             ),
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")
     })
-    public ResultResponse<?> register(@Valid @RequestBody UserRegisterRequest user) {
-        try {
-            return ResultResponse.<UserResponse>builder().result(userService.register(user)).build();
-        } catch (RuntimeException e) {
-            return ResultResponse.builder().message(e.getMessage()).build();
-        }
+//    public ResultResponse<?> register(@Valid @RequestBody UserRegisterRequest user) {
+//        try {
+//            return ResultResponse.<UserResponse>builder().result(userService.register(user)).build();
+//        } catch (RuntimeException e) {
+//            return ResultResponse.builder().message(e.getMessage()).build();
+//        }
+//    }
+    public  ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequest user){
+
+            return ResponseEntity.ok(userService.register(user));
+
     }
 
     // Verify OTP
@@ -238,7 +243,7 @@ public class AuthController {
         return ResponseEntity.ok().body(ResultResponse.builder().message("Logged out successfully").build());
     }
 
-    // Xóa mềm user
+    // Xóa hẳng  user
     @DeleteMapping("/{id}")
     @Operation(summary = "Xóa user", description = "Xóa user theo id")
     @ApiResponses(value = {
@@ -250,22 +255,22 @@ public class AuthController {
         return ResponseEntity.ok("User đã bị đánh dấu là xóa.");
     }
 
-    // Xóa mềm user
-    @DeleteMapping("block/{id}")
-    @Operation(summary = "Xóa user", description = "Xóa user theo id")
+    // khóa tài khoản user mềm user
+    @PutMapping("/{id}/block")
+    @Operation(summary = "Khóa tài khoản user", description = "Khóa tài khoản user theo id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")
     })
     public ResponseEntity<String> blockUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+        userService.blockUser(id);
         return ResponseEntity.ok("User đã bị đánh dấu là xóa.");
     }
 
 
-    // Vô hiệu hóa user
-    @PutMapping("/{id}/deactivate")
-    @Operation(summary = "Vô hiệu hóa user", description = "Vô hiệu hóa user theo id")
+    // Ngưng hoạt động tài khoản
+    @PutMapping("/{id}/deactivated")
+    @Operation(summary = "Ngưng hoạt động tài khoản", description = "Ngưng hoạt động tài khoản user theo id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")

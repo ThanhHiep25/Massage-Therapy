@@ -2,6 +2,7 @@
 package com.example.spa.services;
 
 import com.example.spa.dto.request.StaffRequest;
+import com.example.spa.dto.response.StaffResponse;
 import com.example.spa.entities.Staff;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface StaffService {
-    List<Staff> getAllStaffs();
+    List<StaffResponse> getAllStaffs();
 
     Staff getStaffById(Long id);
 

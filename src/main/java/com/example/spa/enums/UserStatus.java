@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum UserStatus {
   ACTIVATE,        // Đang hoạt động
-  DEACTIVATED,   // Bị vô hiệu hóa (có thể khôi phục)
+  DEACTIVATED,   // Ngưng hoạt động
   DELETED,
+  BLOCKED,       // Khóa tài khoản người dùng
 }

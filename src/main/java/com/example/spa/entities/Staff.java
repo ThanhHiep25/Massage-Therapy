@@ -2,6 +2,7 @@ package com.example.spa.entities;
 
 
 import com.example.spa.enums.StatusBasic;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +36,7 @@ public class Staff {
     private String address;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonIgnore
     private Position position;
 
     @Column(name = "image_url")
@@ -47,6 +49,7 @@ public class Staff {
     private LocalDate startDate;
 
     @ManyToOne
+    @JsonIgnore
     private Department department;
 
     @ManyToMany

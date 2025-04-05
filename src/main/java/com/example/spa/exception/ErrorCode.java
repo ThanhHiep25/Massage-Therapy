@@ -49,7 +49,7 @@ public enum ErrorCode {
 
     // Department
     DEPARTMENT_INVALID(1001, "Department  error", HttpStatus.NOT_FOUND),
-    DEPARTMENT_NOT_EXISTED(404, "Department not found", HttpStatus.NOT_FOUND),
+    DEPARTMENT_NOT_FOUND(404, "Department not found", HttpStatus.NOT_FOUND),
     DEPARTMENT_UPDATED(1000, "Department updated successfully", HttpStatus.OK),
     DEPARTMENT_CREATED(1000, "Department created successfully", HttpStatus.CREATED),
     DEPARTMENT_DELETED(1000, "Department deleted successfully", HttpStatus.NO_CONTENT),
@@ -66,7 +66,7 @@ public enum ErrorCode {
 
     // Candidate
     CANDIDATE_INVALID(1001, "Candidate  error", HttpStatus.NOT_FOUND),
-    CANDIDATE_NOT_EXISTED(404, "Candidate not found", HttpStatus.NOT_FOUND),
+    CANDIDATE_NOT_FOUND(404, "Candidate not found", HttpStatus.NOT_FOUND),
     CANDIDATE_UPDATED(1000, "Candidate updated successfully", HttpStatus.OK),
     CANDIDATE_CREATED(1000, "Candidate created successfully", HttpStatus.CREATED),
     CANDIDATE_DELETED(1000, "Candidate deleted successfully", HttpStatus.NO_CONTENT),
@@ -100,7 +100,15 @@ public enum ErrorCode {
     SERVICE_CREATED(1000, "Service created successfully", HttpStatus.OK),
     SERVICE_DELETED(1000, "Service deleted successfully", HttpStatus.NO_CONTENT),
     SERVICE_ALREADY_EXISTED(1006, "Service name already existed", HttpStatus.BAD_REQUEST),
-    SERVICE_ERROR(405, "Service error", HttpStatus.BAD_REQUEST)
+    SERVICE_ERROR(405, "Service error", HttpStatus.BAD_REQUEST),
+
+    // Service Staff
+    STAFF_SERVICE_NOT_FOUND(404, "Service not found", HttpStatus.NOT_FOUND),
+    STAFF_SERVICE_INVALID(1001, "Service  error", HttpStatus.NOT_FOUND),
+    STAFF_SERVICE_UPDATED(1000, "Service updated successfully", HttpStatus.OK),
+    STAFF_SERVICE_CREATED(1000, "Service created successfully", HttpStatus.CREATED),
+    STAFF_SERVICE_DELETED(1000, "Service deleted successfully", HttpStatus.NO_CONTENT),
+    STAFF_SERVICE_ALREADY_EXISTED(1006, "Service name already existed", HttpStatus.BAD_REQUEST),
     ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

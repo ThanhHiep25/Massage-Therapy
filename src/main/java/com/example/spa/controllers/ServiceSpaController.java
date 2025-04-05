@@ -34,16 +34,11 @@ public class ServiceSpaController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public ResponseEntity<?> createServiceSpa(@RequestBody ServiceSpaRequest serviceSpaRequest) {
-      try {
+
           List<ServiceStep> steps = serviceSpaRequest.getSteps(); // Lấy danh sách bước từ request
           ServiceSpa createdService = serviceSpaService.createServiceSpa(serviceSpaRequest, steps);
           return ResponseEntity.ok(createdService);
-      }catch (AppException e){
-          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                  "errorCode", "SERVICE_CREATION_FAILED",
-                  "message", "Có lỗi xảy ra khi tạo dịch vụ"
-          ));
-      }
+
     }
 
     @GetMapping("/{id}")
