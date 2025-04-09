@@ -2,6 +2,7 @@ package com.example.spa.controllers;
 
 import com.example.spa.dto.ResultResponse;
 import com.example.spa.dto.request.AppointmentRequest;
+import com.example.spa.dto.response.AppointmentResponse;
 import com.example.spa.entities.Appointment;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
@@ -22,6 +23,8 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+
+    // Tạo lịch hẹn
     @PostMapping("/create")
     @Operation(summary = "Tạo lịch hẹn", description = "Tạo lịch hẹn")
     @ApiResponses(value = {
@@ -29,12 +32,8 @@ public class AppointmentController {
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")
     })
     public ResponseEntity<?> createAppointment(@RequestBody AppointmentRequest request) {
-        try {
-            Appointment appointment = appointmentService.createAppointment(request);
-            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_CREATED));
-        } catch (AppException e) {
-            return ResponseEntity.status(400).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
-        }
+            AppointmentResponse appointment = appointmentService.createAppointment(request);
+            return ResponseEntity.ok(appointment);
 
     }
 
@@ -57,7 +56,7 @@ public class AppointmentController {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
-    public ResponseEntity<List<Appointment>> getAllAppointments() {
+    public ResponseEntity<List<AppointmentResponse>> getAllAppointments() {
         return ResponseEntity.ok(appointmentService.getAllAppointments());
     }
 
@@ -73,6 +72,7 @@ public class AppointmentController {
         return ResponseEntity.ok(updatedAppointment);
     }
 
+
     // Xóa lịch hẹn
     @DeleteMapping("/{id}")
     @Operation(summary = "Xóa lịch hẹn", description = "Xóa lịch hẹn")
@@ -81,12 +81,8 @@ public class AppointmentController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public ResponseEntity<?> deleteAppointment(@PathVariable Long id) {
-        try {
             appointmentService.deleteAppointment(id);
-            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_DELETED));
-        } catch (AppException e) {
-            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
-        }
+            return ResponseEntity.ok(appointmentService);
     }
 
 //    // Lọc lịch hẹn theo user
@@ -141,12 +137,8 @@ public class AppointmentController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public  ResponseEntity<?> pendingAppointment(@PathVariable Long id) {
-        try {
             appointmentService.pendingAppointment(id);
-            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_PENDING));
-        } catch (AppException e) {
-            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
-        }
+            return ResponseEntity.ok("Chuyển trạng thái lịch hẹn sang chờ xác nhận");
     }
 
     // Chuyển trạng thái lịch hẹn sang đã hủy
@@ -157,12 +149,8 @@ public class AppointmentController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public  ResponseEntity<?> cancelAppointment(@PathVariable Long id) {
-        try {
             appointmentService.cancelAppointment(id);
             return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_CANCELLED));
-        } catch (AppException e) {
-            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
-        }
     }
 
     // Chuyển trạng thái lịch hẹn sang đã hoàn thành
@@ -173,12 +161,8 @@ public class AppointmentController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public  ResponseEntity<?> completeAppointment(@PathVariable Long id) {
-        try {
             appointmentService.completeAppointment(id);
-            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_COMPLETED));
-        } catch (AppException e) {
-            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
-        }
+            return ResponseEntity.ok("Chuyển trạng thái lịch hẹn sang đã hoàn thành");
     }
 
     // Chuyển trạng thái lịch hẹn sang đã đặt lịch
@@ -189,12 +173,9 @@ public class AppointmentController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public  ResponseEntity<?> scheduledAppointment(@PathVariable Long id) {
-        try {
             appointmentService.scheduledAppointment(id);
-            return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_SCHEDULED));
-        } catch (AppException e) {
-            return ResponseEntity.status(404).body(new AppException(ErrorCode.APPOINTMENT_INVALID));
-        }
+            return ResponseEntity.ok("Chuyển trạng thái lịch hẹn sang đã đặt lịch");
+
     }
 
 }

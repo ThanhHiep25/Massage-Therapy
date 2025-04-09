@@ -27,14 +27,14 @@ public class Appointment {
     @JoinColumn(name = "user_user_id",referencedColumnName = "userId", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "staff_id", referencedColumnName = "staffId", nullable = false)
-    private Staff staff;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "staff_id", referencedColumnName = "staffId", nullable = false)
+//    private Staff staff;
 
     @Column(name = "appointment_date_time", nullable = false)
     private LocalDateTime appointmentDateTime;
 
-    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
+    @Column(name = "total_price", nullable = false, precision = 20, scale = 2)
     private BigDecimal totalPrice;
 
     @Column(name = "notes", columnDefinition = "TEXT") // Chấp nhận văn bản dài
@@ -68,7 +68,6 @@ public class Appointment {
         return "Appointment{" +
                 "appointmentId=" + appointmentId +
                 ", user=" + user +
-                ", staff=" + staff +
                 ", appointmentDateTime=" + appointmentDateTime +
                 ", totalPrice=" + totalPrice +
                 ", notes='" + notes + '\'' +

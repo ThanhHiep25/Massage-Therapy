@@ -85,12 +85,10 @@ public class StaffServiceImpl implements StaffService {
         if (!staffRepository.existsById(id)) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
-        if (appointmentRepository.existsByStaffStaffId(id)) {
-            throw new AppException(ErrorCode.STAFF_ALREADY_EXISTED);
-        }
 
         staffRepository.deleteById(id);
     }
+
 
     @Override
     @Transactional

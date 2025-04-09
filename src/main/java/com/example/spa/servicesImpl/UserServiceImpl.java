@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        if (user.getStatus() == UserStatus.DEACTIVATED) {
+        if (user.getStatus() == UserStatus.BLOCKED) {
             System.out.println("User Status: " + user.getStatus()); // Debug
             throw new AppException(ErrorCode.USER_BLOCKED);
         }

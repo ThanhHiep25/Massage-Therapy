@@ -1,16 +1,17 @@
 package com.example.spa.services;
 
 import com.example.spa.dto.request.AppointmentRequest;
+import com.example.spa.dto.response.AppointmentResponse;
 import com.example.spa.entities.Appointment;
 
 import java.util.List;
 
 public interface AppointmentService {
-    Appointment createAppointment(AppointmentRequest request);
+    AppointmentResponse createAppointment(AppointmentRequest request);
 
     Appointment getAppointmentById(Long id);
 
-    List<Appointment> getAllAppointments();
+    List<AppointmentResponse> getAllAppointments();
 
     Appointment updateAppointment(Long id, AppointmentRequest request);
 

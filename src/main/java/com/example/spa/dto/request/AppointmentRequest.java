@@ -14,9 +14,7 @@ import java.util.List;
 @Builder
 public class AppointmentRequest {
     private Long userId;
-    private Long serviceSpaId;
     private LocalDateTime appointmentDateTime;
-    private Long staffId;
     private BigDecimal totalPrice;
     private String notes;
     private AppointmentStatus status;
@@ -28,9 +26,7 @@ public class AppointmentRequest {
     public String toString() {
         return "AppointmentRequest{" +
                 "userId=" + userId +
-                ", serviceSpaId=" + serviceSpaId +
                 ", appointmentDateTime=" + appointmentDateTime +
-                ", staffId=" + staffId +
                 ", totalPrice=" + totalPrice +
                 ", notes='" + notes + '\'' +
                 ", status=" + status +

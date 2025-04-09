@@ -4,7 +4,6 @@ import com.example.spa.dto.request.UserRegisterRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -22,10 +21,10 @@ public class OtpService {
 
     private static final long OTP_EXPIRATION_TIME = 3 * 60 * 1000;  // 3 phút
     // Lưu thông tin đăng ký tạm thời
-    private Map<String, UserRegisterRequest> pendingUsers = new HashMap<>();
+    private final Map<String, UserRegisterRequest> pendingUsers = new HashMap<>();
 
     // Lưu OTP và thời gian hết hạn
-    private Map<String, OtpData> otpStorage = new HashMap<>();
+    private final Map<String, OtpData> otpStorage = new HashMap<>();
 
     // Sinh OTP ngẫu nhiên
     public String generateOtp() {
@@ -124,8 +123,8 @@ public class OtpService {
 
     // Lớp phụ để lưu OTP và thời gian hết hạn
     private static class OtpData {
-        private String otp;
-        private long expirationTime;
+        private final String otp;
+        private final long expirationTime;
 
         public OtpData(String otp, long expirationTime) {
             this.otp = otp;

@@ -20,7 +20,7 @@ public class StaffServiceSpaController {
 
     private final StaffServiceSpaService staffServiceSpaService;
 
-
+    //  Phân công nhân viên vào dịch vụ
     @PostMapping
     @Operation(summary = "Phân công nhân viên vào dịch vụ")
     @ApiResponses(value = {
@@ -81,4 +81,102 @@ public class StaffServiceSpaController {
         staffServiceSpaService.deleteStaffService(id);
         return ResponseEntity.ok("Xóa thành công!");
     }
+
+    // 5. Cập nhật trạng thái chưa phân công nhân viên - dịch vụ
+    @PutMapping("/unassigned/{id}")
+    @Operation(summary = "Cập nhật trạng thái chưa phân công nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> unassigned(@PathVariable Long id) {
+        staffServiceSpaService.Unassigned(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
+
+    // 6. Cập nhật trạng thái đang phân công nhân viên - dịch vụ
+    @PutMapping("/assigning/{id}")
+    @Operation(summary = "Cập nhật trạng thái đang phân công nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> assigning(@PathVariable Long id) {
+        staffServiceSpaService.Assigning(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
+    // 7. Cập nhật trạng thái đã phân công nhân viên - dịch vụ
+    @PutMapping("/assigned/{id}")
+    @Operation(summary = "Cập nhật trạng thái đã phân công nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> assigned(@PathVariable Long id) {
+        staffServiceSpaService.Assigned(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
+    // 8. Cập nhật trạng thái đang thực hiện nhân viên - dịch vụ
+    @PutMapping("/in-progress/{id}")
+    @Operation(summary = "Cập nhật trạng thái đang thực hiện nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> inProgress(@PathVariable Long id) {
+        staffServiceSpaService.InProgress(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
+    // 9. Cập nhật trạng thái đã hoàn thành nhân viên - dịch vụ
+    @PutMapping("/completed/{id}")
+    @Operation(summary = "Cập nhật trạng thái đã hoàn thành nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> completed(@PathVariable Long id) {
+        staffServiceSpaService.Completed(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
+    // 10. Cập nhật trạng thái đã hủy nhân viên - dịch vụ
+    @PutMapping("/cancelled/{id}")
+    @Operation(summary = "Cập nhật trạng thái đã hủy nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> cancelled(@PathVariable Long id) {
+        staffServiceSpaService.cancelled(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
+    // 11. Cập nhật trạng thái chờ phê duyệt nhân viên - dịch vụ
+    @PutMapping("/approval/{id}")
+    @Operation(summary = "Cập nhật trạng thái chờ phê duyệt nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> approval(@PathVariable Long id) {
+        staffServiceSpaService.Approval(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
+    // 12. Cập nhật trạng thái đã quá hạn nhân viên - dịch vụ
+    @PutMapping("/overdue/{id}")
+    @Operation(summary = "Cập nhật trạng thái đã quá hạn nhân viên - dịch vụ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<String> overdue(@PathVariable Long id) {
+        staffServiceSpaService.Overdue(id);
+        return ResponseEntity.ok("Cập nhật thành công!");
+    }
+
 }

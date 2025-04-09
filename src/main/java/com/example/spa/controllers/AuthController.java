@@ -2,6 +2,7 @@ package com.example.spa.controllers;
 
 
 import com.example.spa.dto.ResultResponse;
+import com.example.spa.dto.request.OtpRequest;
 import com.example.spa.dto.request.UserLoginRequest;
 import com.example.spa.dto.request.UserRegisterRequest;
 import com.example.spa.dto.request.UserRequest;
@@ -61,9 +62,7 @@ public class AuthController {
 //        }
 //    }
     public  ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequest user){
-
             return ResponseEntity.ok(userService.register(user));
-
     }
 
     // Verify OTP
@@ -74,16 +73,17 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")
     })
     @PostMapping("/verify-otp")
-    public ResultResponse<?> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+    public ResultResponse<?> verifyOtp(@RequestBody OtpRequest request) {
         try {
             return ResultResponse.<UserResponse>builder()
-                    .result(userService.verifyOtp(email, otp))
+                    .result(userService.verifyOtp(request.getEmail(), request.getOtp()))
                     .message("OTP verified successfully")
                     .build();
         } catch (RuntimeException e) {
             return ResultResponse.builder().message(e.getMessage()).build();
         }
     }
+
 
     // Create user
     @PostMapping("/create")

@@ -44,5 +44,6 @@ public class ServiceSpaResponse {
                 .collect(Collectors.toList());
         this.status = serviceSpa.getStatus().name(); // Thêm trư��ng status vào DTO
     }
+
 }
 

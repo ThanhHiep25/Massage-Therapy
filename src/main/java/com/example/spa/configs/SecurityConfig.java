@@ -31,8 +31,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Tắt CSRF (nếu dùng cookie, có thể cần bật lại)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                "/api/**",
                                 "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/verify-otp",
                                 "/api/auth/refresh-token",
                                 "/api/auth/logout",
                                 "/api/auth/forgot-password",
