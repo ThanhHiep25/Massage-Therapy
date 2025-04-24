@@ -1,0 +1,20 @@
+package com.example.spa.dto.request;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class UserLoginRequest {
+
+    @NotNull(message = "Email không được để trống")
+    private String email;
+
+    @NotBlank(message = "Password không được để trống")
+    @Size(min = 6, message = "Password phải có ít nhất 6 ký tự")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{6,}$",
+            message = "Password phải chứa ít nhất 1 chữ số, 1 chữ thường, 1 chữ hoa, 1 ký tự đặc biệt và không có khoảng trắng")
+    private String password;
+}
