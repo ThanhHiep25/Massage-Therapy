@@ -28,6 +28,9 @@ import java.util.Optional;
 @RequestMapping("/api/payments")
 public class PaymentVNPayController {
 
+    @Value("${vnp_PaySuccessUrl}")
+    private String paymentSuccessUrl ;
+
     @Autowired
     private PaymentVNPayService paymentVNPayService;
 
@@ -95,7 +98,7 @@ public class PaymentVNPayController {
             if ("00".equalsIgnoreCase(responseCode)) {
                 paymentVNPayService.handleVPNPaymentCallback(params);
                 StringBuilder redirectUrlBuilder = new StringBuilder();
-                redirectUrlBuilder.append("http://localhost:5173/payment-success?")
+                redirectUrlBuilder.append(paymentSuccessUrl)
                         .append("vnp_TransactionStatus=").append(transactionStatus)
                         .append("&vnp_TransactionNo=").append(transactionNo)
                         .append("&vnp_Amount=").append(amount)
@@ -108,7 +111,7 @@ public class PaymentVNPayController {
 
             } else {
                 StringBuilder redirectUrlBuilder = new StringBuilder();
-                redirectUrlBuilder.append("http://localhost:5173/payment-success?") // Chuyển hướng đến trang thất bại
+                redirectUrlBuilder.append(paymentSuccessUrl) // Chuyển hướng đến trang thất bại
                         .append("vnp_TransactionStatus=").append(transactionStatus)
                         .append("&vnp_TransactionNo=").append(transactionNo)
                         .append("&vnp_OrderInfo=").append(orderInfor);

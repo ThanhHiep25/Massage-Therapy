@@ -109,6 +109,17 @@ public enum ErrorCode {
     STAFF_SERVICE_CREATED(1000, "Service created successfully", HttpStatus.CREATED),
     STAFF_SERVICE_DELETED(1000, "Service deleted successfully", HttpStatus.NO_CONTENT),
     STAFF_SERVICE_ALREADY_EXISTED(1006, "Service name already existed", HttpStatus.BAD_REQUEST),
+
+    // Product
+    PRODUCT_INVALID(1001, "Product  error", HttpStatus.NOT_FOUND),
+    PRODUCT_NOT_FOUND(404, "Product not found", HttpStatus.NOT_FOUND),
+    PRODUCT_UPDATED(1000, "Product updated successfully", HttpStatus.OK),
+    PRODUCT_CREATED(1000, "Product created successfully", HttpStatus.CREATED),
+    PRODUCT_DELETED(1000, "Product deleted successfully", HttpStatus.NO_CONTENT),
+    PRODUCT_ALREADY_EXISTED(1006, "Product name already existed", HttpStatus.BAD_REQUEST),
+    PRODUCT_OUT_OF_STOCK(1010, "Product out of stock", HttpStatus.BAD_REQUEST)
+
+
     ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

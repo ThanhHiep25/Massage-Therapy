@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,11 +14,14 @@ import java.util.List;
 @Configuration
 public class OpenAPIConfiguration {
 
+    @Value("${localhostURL}")
+    private String localHost;
+
     @Bean
     public OpenAPI defineOpenApi() {
         // Server Configuration
         Server server = new Server();
-        server.setUrl("http://localhost:5000");
+        server.setUrl(localHost);
         //server.setUrl("http://192.168.1.177:5000");
         server.setDescription("Management API Documentation");
 

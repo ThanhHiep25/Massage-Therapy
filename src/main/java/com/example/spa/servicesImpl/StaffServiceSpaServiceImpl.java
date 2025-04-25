@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -194,4 +195,37 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
         staffServiceSpa.setStatus(StaffServiceStatus.Overdue);
         staffServiceSpaRepository.save(staffServiceSpa);
     }
+
+
+    //Thống kê số lượng phân công nhân viên - dịch vụ
+    @Override
+    public long countAllStaffServices() {
+        return staffServiceSpaRepository.count();
+    }
+
+    // Thống kê số lượng phân công theo trạng thái
+    @Override
+    public long countStaffServicesByStatus(StaffServiceStatus status) {
+        return staffServiceSpaRepository.countByStatus(status);
+    }
+
+    // Thống kê số lượng dịch vụ được giao cho một nhân viên
+    @Override
+    public long countServiceByStaffId(Long staffId) {
+        return staffServiceSpaRepository.countByStaff_StaffId(staffId);
+    }
+
+    // Thống kê số lượng nhân viên giao dịch vụ
+    @Override
+    public long countStaffByServiceId(Long serviceId) {
+        return staffServiceSpaRepository.countByServiceSpaServiceId(serviceId);
+    }
+
+    // Thống kê số lượng dịch vụ được giao cho mỗi nhân viên
+    @Override
+    public Map<Staff, Long> countServicesAssignedToAllStaff() {
+        return staffServiceSpaRepository.findAll().stream()
+                .collect(Collectors.groupingBy(StaffServiceSpa::getStaff, Collectors.counting()));
+    }
+
 }

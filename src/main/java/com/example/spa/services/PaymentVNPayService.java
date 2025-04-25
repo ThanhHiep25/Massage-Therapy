@@ -15,9 +15,14 @@ public interface PaymentVNPayService {
 
 	Payment createPayment(AppointmentResponse appointment, Long amount, String paymentMethod, String status);
 
+	Payment createPaymentGooglePay(AppointmentResponse appointmentResponse, Long amount, String paymentMethod);
+
 	String createVNPayPayment(AppointmentResponse appointment, Long amount);
 
 	PaymentDTO handleVPNPaymentCallback(Map<String, String> params) throws UnsupportedEncodingException;
+
+	// setStatus SUCCESS
+	void setStatusSuccess(Long id);
 
 	Optional<Payment> findById(Long id);
 

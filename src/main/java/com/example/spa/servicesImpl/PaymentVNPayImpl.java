@@ -6,6 +6,8 @@ import com.example.spa.entities.Appointment;
 import com.example.spa.entities.Payment;
 import com.example.spa.enums.AppointmentStatus;
 import com.example.spa.enums.PaymentStatus;
+import com.example.spa.exception.AppException;
+import com.example.spa.exception.ErrorCode;
 import com.example.spa.repositories.AppointmentRepository;
 import com.example.spa.repositories.PaymentRepository;
 import com.example.spa.services.MailService;
@@ -53,6 +55,25 @@ public class PaymentVNPayImpl implements PaymentVNPayService {
     // Tạo lịch hẹn
     @Override
     public Payment createPayment(AppointmentResponse appointmentResponse, Long amount, String paymentMethod, String status) {
+        // Lấy đối tượng Appointment từ database dựa trên ID trong AppointmentResponse
+        Appointment appointment = appointmentRepository.findById(appointmentResponse.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch hẹn với ID: " + appointmentResponse.getId()));
+
+        Payment payment = new Payment();
+        payment.setAppointment(appointment); // Thiết lập đối tượng Appointment thực tế
+        payment.setAmount(BigDecimal.valueOf(amount));
+        payment.setPaymentMethod(paymentMethod);
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setTransactionTime(LocalDateTime.now());
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setCreatedAt(LocalDateTime.now());
+        payment.setUpdatedAt(LocalDateTime.now());
+
+        return paymentRepository.save(payment);
+    }
+
+    @Override
+    public Payment createPaymentGooglePay(AppointmentResponse appointmentResponse, Long amount, String paymentMethod) {
         // Lấy đối tượng Appointment từ database dựa trên ID trong AppointmentResponse
         Appointment appointment = appointmentRepository.findById(appointmentResponse.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch hẹn với ID: " + appointmentResponse.getId()));
@@ -269,6 +290,16 @@ public class PaymentVNPayImpl implements PaymentVNPayService {
                 sortedParams.get("vnp_BankCode"),
                 sortedParams.get("vnp_BankTranNo"),
                 queryUrl);
+    }
+
+
+    // setStatus SUCCESS
+    @Override
+    public void setStatusSuccess(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_EXISTED));
+        payment.setStatus(PaymentStatus.SUCCESS);
+        paymentRepository.save(payment);
     }
 
     // Lấy thống tin thanh toán theo ID
