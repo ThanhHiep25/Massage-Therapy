@@ -3,13 +3,13 @@ package com.example.spa.servicesImpl;
 
 import com.example.spa.dto.request.StaffServiceRequest;
 import com.example.spa.dto.response.StaffServiceResponse;
-import com.example.spa.entities.ServiceSpa;
+import com.example.spa.entities.Appointment;
 import com.example.spa.entities.Staff;
 import com.example.spa.entities.StaffServiceSpa;
 import com.example.spa.enums.StaffServiceStatus;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
-import com.example.spa.repositories.ServiceSpaRepository;
+import com.example.spa.repositories.AppointmentRepository;
 import com.example.spa.repositories.StaffRepository;
 import com.example.spa.repositories.StaffServiceSpaRepository;
 import com.example.spa.services.StaffServiceSpaService;
@@ -27,7 +27,7 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
 
     private final StaffRepository staffRepository;
 
-    private final ServiceSpaRepository serviceSpaRepository;
+    private final AppointmentRepository appointmentRepository;
 
     private final StaffServiceSpaRepository staffServiceSpaRepository;
 
@@ -39,18 +39,13 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
         Staff staff = staffRepository.findById(request.getStaffId())
                 .orElseThrow(() -> new RuntimeException("Staff not found"));
 
-        ServiceSpa serviceSpa = serviceSpaRepository.findById(request.getServiceId())
-                .orElseThrow(() -> new RuntimeException("Service not found"));
+        Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-        // Kiểm tra xem đã có phân công này chưa
-        boolean exists = staffServiceSpaRepository.existsByStaffAndServiceSpa(staff, serviceSpa);
-        if (exists) {
-            throw new AppException(ErrorCode.STAFF_SERVICE_ALREADY_EXISTED);
-        }
 
         StaffServiceSpa staffServiceSpa = StaffServiceSpa.builder()
                 .staff(staff)
-                .serviceSpa(serviceSpa)
+                .appointment(appointment)
                 .assignedDate(request.getAssignedDate())
                 .note(request.getNote())
                 .status(request.getStatus() != null ? request.getStatus() : StaffServiceStatus.Unassigned)
@@ -65,7 +60,7 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
     // 2. Lấy danh sách nhân viên theo dịch vụ
     @Override
     public List<StaffServiceResponse> getStaffByService(Long serviceId) {
-        return staffServiceSpaRepository.findByServiceSpaServiceId(serviceId);
+        return staffServiceSpaRepository.findByAppointmentAppointmentId(serviceId);
     }
 
     // 3. Lấy danh sách dịch vụ mà nhân viên đang làm
@@ -92,11 +87,11 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
         Staff staff = staffRepository.findById(request.getStaffId())
                 .orElseThrow(() -> new AppException(ErrorCode.STAFF_NOT_EXISTED));
 
-        ServiceSpa serviceSpa = serviceSpaRepository.findById(request.getServiceId())
-                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
+        Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
         staffServiceSpa.setStaff(staff);
-        staffServiceSpa.setServiceSpa(serviceSpa);
+        staffServiceSpa.setAppointment(appointment);
         staffServiceSpa.setAssignedDate(request.getAssignedDate());
         staffServiceSpa.setNote(request.getNote());
 
@@ -197,35 +192,5 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
     }
 
 
-    //Thống kê số lượng phân công nhân viên - dịch vụ
-    @Override
-    public long countAllStaffServices() {
-        return staffServiceSpaRepository.count();
-    }
-
-    // Thống kê số lượng phân công theo trạng thái
-    @Override
-    public long countStaffServicesByStatus(StaffServiceStatus status) {
-        return staffServiceSpaRepository.countByStatus(status);
-    }
-
-    // Thống kê số lượng dịch vụ được giao cho một nhân viên
-    @Override
-    public long countServiceByStaffId(Long staffId) {
-        return staffServiceSpaRepository.countByStaff_StaffId(staffId);
-    }
-
-    // Thống kê số lượng nhân viên giao dịch vụ
-    @Override
-    public long countStaffByServiceId(Long serviceId) {
-        return staffServiceSpaRepository.countByServiceSpaServiceId(serviceId);
-    }
-
-    // Thống kê số lượng dịch vụ được giao cho mỗi nhân viên
-    @Override
-    public Map<Staff, Long> countServicesAssignedToAllStaff() {
-        return staffServiceSpaRepository.findAll().stream()
-                .collect(Collectors.groupingBy(StaffServiceSpa::getStaff, Collectors.counting()));
-    }
 
 }

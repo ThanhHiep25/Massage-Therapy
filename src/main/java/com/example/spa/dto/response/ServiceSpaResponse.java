@@ -5,6 +5,7 @@ import com.example.spa.entities.ServiceSpaImage;
 import com.example.spa.entities.ServiceStep;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ public class ServiceSpaResponse {
     private String serviceType;
     private List<ServiceStepDTO> steps;
     private String status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public ServiceSpaResponse(ServiceSpa serviceSpa, List<ServiceStep> steps) {
         this.id = serviceSpa.getServiceId();
@@ -43,6 +46,8 @@ public class ServiceSpaResponse {
                 .map(ServiceStepDTO::new)
                 .collect(Collectors.toList());
         this.status = serviceSpa.getStatus().name(); // Thêm trư��ng status vào DTO
+        this.createdAt = serviceSpa.getCreatedAt();
+        this.updatedAt = serviceSpa.getUpdatedAt();
     }
 
 }

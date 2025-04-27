@@ -184,6 +184,11 @@ public class ServiceSpaController {
     }
 
     @GetMapping("/export/excel")
+    @Operation(summary = "Xuat danh sach dịch vụ spa thanh file excel", description = "Xuat danh sach dịch vụ spa thanh file excel")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Thành công"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
     public ResponseEntity<byte[]> exportServiceSpasToExcel() throws IOException {
         List<ServiceSpaResponse> serviceSpas = serviceSpaService.getAllServiceSpas().stream()
                 .map(service -> new ServiceSpaResponse(service, service.getSteps()))

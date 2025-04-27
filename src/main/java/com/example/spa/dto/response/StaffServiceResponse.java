@@ -45,7 +45,7 @@ import java.time.LocalDate;
 public class StaffServiceResponse {
     private Long id;
     private StaffResponse staff;
-    private ServiceSpaResponse service;
+    private AppointmentResponse appointment;
     private LocalDate assignedDate;
     private String note;
     private String status;
@@ -53,7 +53,7 @@ public class StaffServiceResponse {
     public StaffServiceResponse(StaffServiceSpa entity) {
         this.id = entity.getId();
         this.staff = new StaffResponse(entity.getStaff());
-        this.service = new ServiceSpaResponse(entity.getServiceSpa(), entity.getServiceSpa().getSteps());
+        this.appointment = new AppointmentResponse(entity.getAppointment());
         this.assignedDate = entity.getAssignedDate();
         this.note = entity.getNote();
         this.status = entity.getStatus().name();

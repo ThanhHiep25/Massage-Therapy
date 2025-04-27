@@ -4,6 +4,7 @@ import com.example.spa.dto.request.GooglePayPaymentRequest;
 import com.example.spa.dto.response.AppointmentResponse;
 import com.example.spa.entities.Payment;
 import com.example.spa.enums.PaymentStatus;
+import com.example.spa.repositories.PaymentRepository;
 import com.example.spa.services.AppointmentService;
 import com.example.spa.services.PaymentVNPayService; // Import the VNPay service
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,13 @@ public class GooglePayController {
 
     private final PaymentVNPayService paymentVNPayService; // Inject the VNPay service
     private final AppointmentService appointmentService;
+    private final PaymentRepository paymentRepository;
 
-    public GooglePayController(PaymentVNPayService paymentVNPayService, AppointmentService appointmentService) {
+    public GooglePayController(PaymentVNPayService paymentVNPayService, AppointmentService appointmentService,
+                               PaymentRepository paymentRepository) {
         this.paymentVNPayService = paymentVNPayService;
         this.appointmentService = appointmentService;
+        this.paymentRepository = paymentRepository;
     }
 
     @PostMapping("/save-payment-info")
@@ -51,6 +55,7 @@ public class GooglePayController {
 
             // You might need to explicitly save the payment here if createPayment doesn't do it
             // (Looking at your createPayment, it does save the entity)
+            paymentRepository.save(payment);
 
             return ResponseEntity.ok("Thông tin thanh toán Google Pay đã được lưu.");
 

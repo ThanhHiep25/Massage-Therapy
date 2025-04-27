@@ -10,10 +10,7 @@ import com.example.spa.entities.ServiceStep;
 import com.example.spa.enums.StatusBasic;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
-import com.example.spa.repositories.CategoryRepository;
-import com.example.spa.repositories.ServiceSpaImageRepository;
-import com.example.spa.repositories.ServiceSpaRepository;
-import com.example.spa.repositories.ServiceStepRepository;
+import com.example.spa.repositories.*;
 import com.example.spa.services.ServiceSpaService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,8 +42,10 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
     private final ServiceStepRepository serviceStepRepository;
     private final CategoryRepository categoryRepository;
     private final ServiceSpaImageRepository serviceSpaImageRepository;
+    private final AppointmentRepository appointmentRepository;
     private final ObjectMapper objectMapper;
 
+    // Tạo ServiceSpa
     @Override
     @Transactional
     public ServiceSpa createServiceSpa(ServiceSpaRequest serviceSpaRequest, List<ServiceStep> steps) {
@@ -60,14 +59,14 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
         ServiceSpa newService = serviceSpaRequest.toServiceSpa(category);
         ServiceSpa savedService = serviceSpaRepository.save(newService);
 
-        // ✅ Liên kết danh sách ServiceStep với ServiceSpa
+        // Liên kết danh sách ServiceStep với ServiceSpa
         if (steps != null && !steps.isEmpty()) {
             steps.forEach(step -> step.setServiceSpa(savedService));
             savedService.getSteps().addAll(steps); // Gán steps vào ServiceSpa
             serviceStepRepository.saveAll(steps);
         }
 
-        // ✅ Lưu danh sách hình ảnh nếu có
+        //  Lưu danh sách hình ảnh nếu có
         if (serviceSpaRequest.getImageUrls() != null && !serviceSpaRequest.getImageUrls().isEmpty()) {
             List<ServiceSpaImage> images = serviceSpaRequest.getImageUrls().stream()
                     .map(url -> ServiceSpaImage.builder()
@@ -83,31 +82,50 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
     }
 
 
+    // Lấy ServiceSpa theo id
     @Override
     public ServiceSpa getServiceSpaById(Long id) {
         return serviceSpaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ServiceSpa không tồn tại"));
     }
 
+    // Lấy danh sách ServiceSpa
     @Override
     public List<ServiceSpa> getAllServiceSpas() {
         return serviceSpaRepository.findAll();
     }
 
+    // Xoa ServiceSpa
+//    @Override
+//    @Transactional
+//    public void deleteServiceSpa(Long id) {
+//        if (!serviceSpaRepository.existsById(id)) {
+//            throw new AppException(ErrorCode.SERVICE_NOT_FOUND);
+//        }
+//        serviceSpaRepository.deleteById(id);
+//    }
+
     @Override
-    @Transactional
     public void deleteServiceSpa(Long id) {
         if (!serviceSpaRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ServiceSpa không tồn tại");
+            throw new AppException(ErrorCode.SERVICE_NOT_FOUND);
         }
+
+        // Kiểm tra xem có lịch hẹn nào sử dụng ServiceSpa này hay không
+        if (appointmentRepository.existsAppointmentWithServiceSpaId(id) > 0) {
+            throw new AppException(ErrorCode.APPOINTMENT_ALREADY_EXISTED);
+        }
+
         serviceSpaRepository.deleteById(id);
     }
 
+    // Cap nhap ServiceSpa
     @Override
     @Transactional
     public ServiceSpa updateServiceSpa(Long id, ServiceSpaRequest request, List<ServiceStep> steps) {
         ServiceSpa existingService = getServiceSpaById(id);
 
+        // Kiem tra xem category co ton tai hay khong
         if (request.getCategoryId() != null) {
             Categories category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
@@ -148,6 +166,7 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
     }
 
 
+    // Import ServiceSpa tu file
     @Override
     @Transactional
     public Map<String, Object> importServiceSpasFromFile(MultipartFile file) {
@@ -173,13 +192,14 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
 
 
 
-
+// Import ServiceSpa tu danh sách
     @Override
     @Transactional
     public Map<String, Object> importServiceSpas(List<ServiceSpaRequest> requests) {
         List<String> successMessages = new ArrayList<>();
         List<String> errorMessages = new ArrayList<>();
 
+        // Duyệt qua danh sách `ServiceSpaRequest` và tạo `ServiceSpa`
         for (ServiceSpaRequest request : requests) {
             try {
                 Categories category = categoryRepository.findById(request.getCategoryId())
@@ -194,7 +214,7 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
             }
         }
 
-        // ✅ Trả về Map chứa cả thành công và lỗi
+        // Trả về Map chứa cả thành công và lỗi
         Map<String, Object> response = new HashMap<>();
         response.put("status", errorMessages.isEmpty() ? "success" : "error");
         response.put("success", successMessages);
@@ -205,21 +225,25 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
 
 
 
+    // Xóa tất cả ServiceSpa
     @Override
     public void deleteAllServiceSpas() {
         serviceSpaRepository.deleteAll();
     }
 
+    // Lấy ServiceSpa theo tên
     @Override
     public ServiceSpa findByServiceName(String serviceName) {
         return serviceSpaRepository.findByName(serviceName);
     }
 
+    // Kiem tra ServiceSpa theo tên
     @Override
     public boolean existsByServiceName(String serviceName) {
         return serviceSpaRepository.existsByName(serviceName);
     }
 
+    // Set trạng thái ngừng hoạt động
     @Override
     public void deactivateServiceSpa(Long id) {
         try {
@@ -232,6 +256,7 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
         }
     }
 
+    // Set trạng thái hóat động
     @Override
     public void activateServiceSpa(Long id) {
         try {
@@ -244,6 +269,7 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
         }
     }
 
+    // Xuat file excel
     @Override
     public byte[] exportServiceSpasToExcel(List<ServiceSpaResponse> serviceSpas) throws IOException {
         Workbook workbook = new XSSFWorkbook();

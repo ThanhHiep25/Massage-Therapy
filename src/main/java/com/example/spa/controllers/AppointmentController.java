@@ -164,7 +164,7 @@ public class AppointmentController {
     })
     public ResponseEntity<?> cancelAppointment(@PathVariable Long id) {
         appointmentService.cancelAppointment(id);
-        return ResponseEntity.ok(new AppException(ErrorCode.APPOINTMENT_CANCELLED));
+        return ResponseEntity.ok("Chuyển trạng thái lịch hẹn sang đã hủy");
     }
 
     // Chuyển trạng thái lịch hẹn sang đã hoàn thành

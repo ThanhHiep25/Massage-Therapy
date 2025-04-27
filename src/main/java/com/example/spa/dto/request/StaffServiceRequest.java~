@@ -24,7 +24,7 @@ public class StaffServiceRequest {
     public String toString() {
         return "StaffServiceRequest{" +
                 "staffId=" + staffId +
-                ", serviceId=" + appointmentId +
+                ", serviceId=" + serviceId +
                 ", assignedDate=" + assignedDate +
                 ", note='" + note + '\'' +
                 ", status=" + status +

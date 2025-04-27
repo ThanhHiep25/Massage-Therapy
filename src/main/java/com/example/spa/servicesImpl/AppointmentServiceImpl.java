@@ -417,11 +417,11 @@ public class AppointmentServiceImpl implements AppointmentService {
         for (AppointmentResponse appointment : appointments) {
             Row row = sheet.createRow(rowNum++);
             createCell(row, 0, appointment.getId(), dataStyle);
-            createCell(row, 1, appointment.getUserId() != null ? appointment.getUserId().getName() : "", dataStyle);
-            createCell(row, 2, appointment.getGustName(), dataStyle);
+            createCell(row, 1, appointment.getUserId() != null ? appointment.getUserId().getName() : "Trống", dataStyle);
+            createCell(row, 2, appointment.getGustName() != null ? appointment.getGustName() : "Trống", dataStyle);
             createCell(row, 3, appointment.getAppointmentDateTime() != null ? appointment.getAppointmentDateTime().format(formatter) : "", dataStyle);
-            createCell(row, 4, appointment.getTotalPrice() != null ? appointment.getTotalPrice().toString() : "", dataStyle);
-            createCell(row, 5, appointment.getNotes(), dataStyle);
+            createCell(row, 4, appointment.getTotalPrice() != null ? appointment.getTotalPrice().toString() : "0.0", dataStyle);
+            createCell(row, 5, appointment.getNotes() != null ? appointment.getNotes() : "Trống", dataStyle);
             createCell(row, 6, appointment.getStatus() != null ? appointment.getStatus().name() : "", dataStyle);
             createCell(row, 7, appointment.getServiceIds().stream().map(ServiceSpaResponse::getName).collect(Collectors.joining(", ")), dataStyle);
             createCell(row, 8, appointment.getCreatedAt() != null ? appointment.getCreatedAt().format(formatter) : "", dataStyle);

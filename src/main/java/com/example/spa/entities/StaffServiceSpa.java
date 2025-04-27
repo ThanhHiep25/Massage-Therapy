@@ -27,8 +27,8 @@ public class StaffServiceSpa {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "service_id", nullable = false)
-    private ServiceSpa serviceSpa;
+    @JoinColumn(name = "appointment_id", nullable = false)
+    private Appointment appointment;
 
     @Column(name = "assigned_date")
     private LocalDate assignedDate; // Ngày nhân viên được giao dịch vụ
@@ -41,16 +41,4 @@ public class StaffServiceSpa {
     private StaffServiceStatus status; // "Pending", "Completed", "Cancelled"
 
 
-
-    @Override
-    public String toString() {
-        return "StaffService{" +
-                "id=" + id +
-                ", staff=" + staff.getName() +
-                ", service=" + serviceSpa.getName() +
-                ", assignedDate=" + assignedDate +
-                ", note='" + note + '\'' +
-                ", status=" + status +
-                '}';
-    }
 }

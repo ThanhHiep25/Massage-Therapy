@@ -41,18 +41,4 @@ public interface StaffServiceSpaService {
 
     void Overdue(Long id);
 
-    //Thống kê số lượng phân công nhân viên - dịch vụ
-    long countAllStaffServices();
-
-    // Thống kê số lượng phân công theo trạng thái
-    long countStaffServicesByStatus(StaffServiceStatus status);
-
-    // Thống kê số lượng dịch vụ được giao cho một nhân viên
-    long countServiceByStaffId(Long staffId);
-
-    // Thống kê số lượng nhân viên giao dịch vụ
-    long countStaffByServiceId(Long serviceId);
-
-    // Thống kê số lượng dịch vụ được giao cho mỗi nhân viên
-    Map<Staff, Long> countServicesAssignedToAllStaff();
 }

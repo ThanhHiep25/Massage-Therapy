@@ -140,6 +140,18 @@ public class PaymentVNPayController {
         }
     }
 
+    // Lấy tất cả thanh toán
+    @GetMapping("/vnpay/transactions")
+    @Operation(summary = "Lấy tất cả thanh toán", description = "Trả về tất cả giao dịch thanh toán",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+                    @ApiResponse(responseCode = "404", description = "Không tìm thấy giao dịch")
+            }
+    )
+    public ResponseEntity<?> getAllTransactions() {
+        return ResponseEntity.ok(paymentVNPayService.findAll());
+    }
+
     // Thống kê tổng thanh toán
     @GetMapping("/vnpay/total")
     @Operation(summary = "Thống kê tổng thanh toán", description = "Trả về tất cả giao dịch thanh toán",

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.example.spa.dto.PaymentDTO;
 import com.example.spa.dto.response.AppointmentResponse;
+import com.example.spa.dto.response.PaymentResponse;
 import com.example.spa.entities.Payment;
 
 
@@ -21,7 +22,10 @@ public interface PaymentVNPayService {
 
 	PaymentDTO handleVPNPaymentCallback(Map<String, String> params) throws UnsupportedEncodingException;
 
-	// setStatus SUCCESS
+    // Lấy tất cả thanh toán
+    List<PaymentResponse> findAll();
+
+    // setStatus SUCCESS
 	void setStatusSuccess(Long id);
 
 	Optional<Payment> findById(Long id);

@@ -2,6 +2,7 @@ package com.example.spa.servicesImpl;
 
 import com.example.spa.dto.PaymentDTO;
 import com.example.spa.dto.response.AppointmentResponse;
+import com.example.spa.dto.response.PaymentResponse;
 import com.example.spa.entities.Appointment;
 import com.example.spa.entities.Payment;
 import com.example.spa.enums.AppointmentStatus;
@@ -25,6 +26,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -292,6 +294,13 @@ public class PaymentVNPayImpl implements PaymentVNPayService {
                 queryUrl);
     }
 
+    // Lấy tất cả thanh toán
+    @Override
+    public List<PaymentResponse> findAll() {
+        List<Payment> payments = paymentRepository.findAll();
+        return payments.stream().map(PaymentResponse::new).collect(Collectors.toList());
+    }
+
 
     // setStatus SUCCESS
     @Override
@@ -301,6 +310,7 @@ public class PaymentVNPayImpl implements PaymentVNPayService {
         payment.setStatus(PaymentStatus.SUCCESS);
         paymentRepository.save(payment);
     }
+
 
     // Lấy thống tin thanh toán theo ID
     @Override

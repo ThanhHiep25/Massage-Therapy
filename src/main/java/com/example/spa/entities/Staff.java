@@ -56,9 +56,9 @@ public class Staff {
     @JoinTable(
             name = "staff_service",
             joinColumns = @JoinColumn(name = "staff_id"),
-            inverseJoinColumns = @JoinColumn(name = "service_id")
+            inverseJoinColumns = @JoinColumn(name = "appointment_id")
     )
-    private List<ServiceSpa> services = new ArrayList<>();
+    private List<Appointment> appointments = new ArrayList<>();
 
 
     @Column(name = "status")
