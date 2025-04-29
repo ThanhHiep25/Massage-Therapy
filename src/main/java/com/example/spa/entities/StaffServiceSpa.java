@@ -30,6 +30,11 @@ public class StaffServiceSpa {
     @JoinColumn(name = "appointment_id", nullable = false)
     private Appointment appointment;
 
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+
     @Column(name = "assigned_date")
     private LocalDate assignedDate; // Ngày nhân viên được giao dịch vụ
 

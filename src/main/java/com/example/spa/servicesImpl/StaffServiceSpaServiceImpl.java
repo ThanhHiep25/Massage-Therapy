@@ -2,14 +2,17 @@ package com.example.spa.servicesImpl;
 
 
 import com.example.spa.dto.request.StaffServiceRequest;
+import com.example.spa.dto.response.AppointmentResponse;
 import com.example.spa.dto.response.StaffServiceResponse;
 import com.example.spa.entities.Appointment;
+import com.example.spa.entities.Department;
 import com.example.spa.entities.Staff;
 import com.example.spa.entities.StaffServiceSpa;
 import com.example.spa.enums.StaffServiceStatus;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
 import com.example.spa.repositories.AppointmentRepository;
+import com.example.spa.repositories.DepartmentRepository;
 import com.example.spa.repositories.StaffRepository;
 import com.example.spa.repositories.StaffServiceSpaRepository;
 import com.example.spa.services.StaffServiceSpaService;
@@ -31,6 +34,8 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
 
     private final StaffServiceSpaRepository staffServiceSpaRepository;
 
+    private final DepartmentRepository departmentRepository;
+
 
     // 1. Phân công nhân viên vào dịch vụ
     @Override
@@ -42,10 +47,35 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
+        Department department = departmentRepository.findById(request.getDepartmentId()) // Fetch Department
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
+        List<StaffServiceSpa> existingAssignmentsForAppointmentAndDepartment = staffServiceSpaRepository
+                .findByAppointment_AppointmentIdAndDepartment_DepartmentId(
+                        appointment.getAppointmentId(),
+                        department.getDepartmentId()
+                );
+
+        int maxStaffPerRoom = 2; //Giới hạn tối đa 3 nhân viên cho một phòng
+        if (existingAssignmentsForAppointmentAndDepartment.size() >= maxStaffPerRoom) {
+            throw new AppException(ErrorCode.MAX_STAFF_PER_ROOM_REACHED);
+        }
+
+        List<StaffServiceSpa> staffAssignments = staffServiceSpaRepository.findByStaffStaffId(staff.getStaffId());
+        boolean hasUncompletedAppointments = staffAssignments.stream()
+                .anyMatch(assignment ->
+                        !assignment.getStatus().equals(StaffServiceStatus.Completed) &&
+                                !assignment.getStatus().equals(StaffServiceStatus.Cancelled)
+                );
+
+        if (hasUncompletedAppointments) {
+            throw new AppException(ErrorCode.STAFF_HAS_UNCOMPLETED_APPOINTMENTS);
+        }
 
         StaffServiceSpa staffServiceSpa = StaffServiceSpa.builder()
                 .staff(staff)
                 .appointment(appointment)
+                .department(department)
                 .assignedDate(request.getAssignedDate())
                 .note(request.getNote())
                 .status(request.getStatus() != null ? request.getStatus() : StaffServiceStatus.Unassigned)
@@ -90,8 +120,12 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
+        Department department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
         staffServiceSpa.setStaff(staff);
         staffServiceSpa.setAppointment(appointment);
+        staffServiceSpa.setDepartment(department);
         staffServiceSpa.setAssignedDate(request.getAssignedDate());
         staffServiceSpa.setNote(request.getNote());
 

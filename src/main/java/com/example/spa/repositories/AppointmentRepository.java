@@ -1,5 +1,6 @@
 package com.example.spa.repositories;
 
+import com.example.spa.dto.response.AppointmentResponse;
 import com.example.spa.entities.Appointment;
 import com.example.spa.enums.AppointmentStatus;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -28,4 +30,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // Query để kiểm tra xem có lịch hẹn nào sử dụng ServiceSpa với ID cho trước hay không
     @Query(value = "SELECT COUNT(*) FROM appointment_services WHERE service_id = :serviceSpaId", nativeQuery = true)
     long existsAppointmentWithServiceSpaId(@Param("serviceSpaId") Long serviceSpaId);
+
+    List<AppointmentResponse> findByStatus(String status);
+
 }

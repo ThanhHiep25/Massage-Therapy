@@ -2,11 +2,8 @@ package com.example.spa.controllers;
 
 import com.example.spa.dto.request.AppointmentRequest;
 import com.example.spa.dto.response.AppointmentResponse;
-import com.example.spa.dto.response.DashboardStatsResponse;
 import com.example.spa.entities.Appointment;
 import com.example.spa.enums.AppointmentStatus;
-import com.example.spa.exception.AppException;
-import com.example.spa.exception.ErrorCode;
 import com.example.spa.services.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,11 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -116,7 +110,7 @@ public class AppointmentController {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
-    public ResponseEntity<List<Appointment>> getAppointmentsByStatus(@PathVariable String status) {
+    public ResponseEntity<List<AppointmentResponse>> getAppointmentsByStatus(@PathVariable String status) {
         return ResponseEntity.ok(appointmentService.getAllAppointmentsByStatus(status));
     }
 

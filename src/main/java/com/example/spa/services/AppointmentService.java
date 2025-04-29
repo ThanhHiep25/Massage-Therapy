@@ -26,10 +26,10 @@ public interface AppointmentService {
 
     void deleteAppointment(Long id);
 
-    List<Appointment> getAllAppointmentsByStatus(String status);
+    // Danh sách lịch hẹn theo trạng thái SCHEDULED
+    List<AppointmentResponse> getAllAppointmentsByStatus(String status);
 
     List<Appointment> getAllAppointmentsByDate(String date);
-
 
     // Trạng thái người ùng đang thực hiện việc đặt lịch
     void inProgress(Long id);

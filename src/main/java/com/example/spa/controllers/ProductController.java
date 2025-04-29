@@ -70,7 +70,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Xóa lịch hẹn", description = "Xóa lịch hẹn")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {

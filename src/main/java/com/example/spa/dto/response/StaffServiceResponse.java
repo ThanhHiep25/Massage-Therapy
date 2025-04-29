@@ -46,6 +46,7 @@ public class StaffServiceResponse {
     private Long id;
     private StaffResponse staff;
     private AppointmentResponse appointment;
+    private DepartmentResponse department;
     private LocalDate assignedDate;
     private String note;
     private String status;
@@ -54,6 +55,7 @@ public class StaffServiceResponse {
         this.id = entity.getId();
         this.staff = new StaffResponse(entity.getStaff());
         this.appointment = new AppointmentResponse(entity.getAppointment());
+        this.department = new DepartmentResponse(entity.getDepartment());
         this.assignedDate = entity.getAssignedDate();
         this.note = entity.getNote();
         this.status = entity.getStatus().name();

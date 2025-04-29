@@ -46,6 +46,7 @@ public enum ErrorCode {
     STAFF_CREATED(1000, "Staff created successfully", HttpStatus.CREATED),
     STAFF_DELETED(1000, "Staff deleted successfully", HttpStatus.NO_CONTENT),
     STAFF_ALREADY_EXISTED(1006, "Staff name already existed", HttpStatus.BAD_REQUEST),
+    STAFF_HAS_UNCOMPLETED_APPOINTMENTS(2001,"Staff has uncompleted appointments" ,HttpStatus.BAD_REQUEST ),
 
     // Department
     DEPARTMENT_INVALID(1001, "Department  error", HttpStatus.NOT_FOUND),
@@ -54,6 +55,7 @@ public enum ErrorCode {
     DEPARTMENT_CREATED(1000, "Department created successfully", HttpStatus.CREATED),
     DEPARTMENT_DELETED(1000, "Department deleted successfully", HttpStatus.NO_CONTENT),
     DEPARTMENT_ALREADY_EXISTED(1006, "Department name already existed", HttpStatus.BAD_REQUEST),
+    MAX_STAFF_PER_ROOM_REACHED(2000 , "Department has max staff", HttpStatus.BAD_REQUEST ),
 
     // Category
     CATEGORY_INVALID(1001, "Category  error", HttpStatus.NOT_FOUND),
@@ -117,7 +119,11 @@ public enum ErrorCode {
     PRODUCT_CREATED(1000, "Product created successfully", HttpStatus.CREATED),
     PRODUCT_DELETED(1000, "Product deleted successfully", HttpStatus.NO_CONTENT),
     PRODUCT_ALREADY_EXISTED(1006, "Product name already existed", HttpStatus.BAD_REQUEST),
-    PRODUCT_OUT_OF_STOCK(1010, "Product out of stock", HttpStatus.BAD_REQUEST)
+    PRODUCT_OUT_OF_STOCK(1010, "Product out of stock", HttpStatus.BAD_REQUEST),
+
+
+    ORDER_NOT_FOUND(404,"Order not found" ,HttpStatus.NOT_FOUND ),
+    INVALID_ORDER_STATUS(1010, "Invalid order status", HttpStatus.BAD_REQUEST),
 
 
     ;

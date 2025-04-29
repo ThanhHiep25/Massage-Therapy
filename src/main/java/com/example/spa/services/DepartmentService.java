@@ -1,26 +1,23 @@
 package com.example.spa.services;
 
+import com.example.spa.dto.request.DepartmentRequest;
+import com.example.spa.dto.response.DepartmentResponse;
 import com.example.spa.entities.Department;
 
 import java.util.List;
 
 public interface DepartmentService {
 
-    Department createDepartment(Department department);
+    DepartmentResponse createDepartment(DepartmentRequest department);
 
-    Department getDepartmentById(Long id);
+    DepartmentResponse getDepartmentById(Long id);
 
-    Department updateDepartment(Long id, Department department);
+    DepartmentResponse updateDepartment(Long id, Department department);
 
     void deleteDepartment(Long id);
 
-    Department getDepartmentByName(String name);
+    List<DepartmentResponse> getAllDepartments();
 
-    List<Department> getDepartmentsByName(String name);
-
-    List<Department> getAllDepartments();
-
-    List<Department> getDepartmentsByStatus(String status);
 
     void activateDepartment(Long id);
 

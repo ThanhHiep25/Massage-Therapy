@@ -19,4 +19,6 @@ public interface StaffServiceSpaRepository extends JpaRepository<StaffServiceSpa
     boolean existsByStaffStaffId(Long id);
 
     List<StaffServiceResponse> findByAppointmentAppointmentId(Long serviceId);
+
+    List<StaffServiceSpa> findByAppointment_AppointmentIdAndDepartment_DepartmentId(Long appointmentId, Long departmentId);
 }

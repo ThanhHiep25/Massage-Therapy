@@ -265,15 +265,43 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     // Lịch hẹn theo trang thái
+    // Lịch hẹn theo trang thái
     @Override
-    public List<Appointment> getAllAppointmentsByStatus(String status) {
+    public List<AppointmentResponse> getAllAppointmentsByStatus(String status) {
         try {
             AppointmentStatus appointmentStatus = AppointmentStatus.valueOf(status.toUpperCase());
-            return appointmentRepository.findAllByStatus(appointmentStatus);
+
+            return appointmentRepository.findAllByStatus(appointmentStatus).stream()
+                    .map(appointment -> {
+                        // Nếu không có user, trả về null
+                        UserResponse userResponse = appointment.getUser() != null
+                                ? new UserResponse(appointment.getUser())
+                                : null;
+
+                        return AppointmentResponse.builder()
+                                .id(appointment.getAppointmentId())
+                                .userId(userResponse) // Trả về null nếu không có user
+                                .gustName(appointment.getGuestName())
+                                .appointmentDateTime(appointment.getAppointmentDateTime())
+                                .totalPrice(appointment.getTotalPrice())
+                                .notes(appointment.getNotes())
+                                .status(appointment.getStatus())
+                                .serviceIds(
+                                        appointment.getServices().stream()
+                                                .map(serviceSpa -> new ServiceSpaResponse(
+                                                        serviceSpa,
+                                                        serviceSpa.getSteps() != null ? serviceSpa.getSteps() : Collections.emptyList()
+                                                ))
+                                                .collect(Collectors.toList())
+                                )
+                                .createdAt(appointment.getCreatedAt())
+                                .updatedAt(appointment.getUpdatedAt())
+                                .build();
+                    })
+                    .collect(Collectors.toList());
         } catch (IllegalArgumentException e) {
             throw new AppException(ErrorCode.APPOINTMENT_INVALID);
         }
-
     }
 
     // Lịch hẹn theo ngày

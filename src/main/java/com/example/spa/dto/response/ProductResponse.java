@@ -18,7 +18,7 @@ public class ProductResponse {
     private String nameProduct;
     private String description;
     private BigDecimal price;
-    private Categories category;
+    private CategoryResponse category;
     private String imageUrl;
     private int quantity;
     private LocalDateTime createdAt;
