@@ -29,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-//    @Override
+    //    @Override
 //    @Transactional
 //    public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
 //        User user = userRepository.findById(createOrderRequest.getUserId())
@@ -75,35 +75,37 @@ public class OrderServiceImpl implements OrderService {
 //
 //        return mapOrderToOrderResponse(savedOrder);
 //    }
-@Override
-@Transactional
-public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
-    Order.OrderBuilder orderBuilder = Order.builder()
-            .shippingAddress(createOrderRequest.getShippingAddress())
-            .shippingPhone(createOrderRequest.getShippingPhone())
-            .notes(createOrderRequest.getNotes())
-            .orderDate(LocalDateTime.now())
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .status(OrderStatus.PENDING);
 
-    // Kiểm tra nếu có userId thì gán User, nếu không thì xử lý khách hàng ẩn danh
-    if (createOrderRequest.getUserId() != null) {
-        User user = userRepository.findById(createOrderRequest.getUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        orderBuilder.user(user);
-    } else {
-        // Xử lý khách hàng ẩn danh
-        String guestName = (createOrderRequest.getGuestName() == null || createOrderRequest.getGuestName().trim().isEmpty())
-                ? "Khách hàng ẩn danh"
-                : createOrderRequest.getGuestName();
-        orderBuilder.guestName(guestName);
-    }
+    // Xây dựng order bằng stream
+    @Override
+    @Transactional
+    public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+        Order.OrderBuilder orderBuilder = Order.builder()
+                .shippingAddress(createOrderRequest.getShippingAddress())
+                .shippingPhone(createOrderRequest.getShippingPhone())
+                .notes(createOrderRequest.getNotes())
+                .orderDate(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .status(OrderStatus.PENDING);
 
-    Order order = orderBuilder.build();
+        // Kiểm tra nếu có userId thì gán User, nếu không thì xử lý khách hàng ẩn danh
+        if (createOrderRequest.getUserId() != null) {
+            User user = userRepository.findById(createOrderRequest.getUserId())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+            orderBuilder.user(user);
+        } else {
+            // Xử lý khách hàng ẩn danh
+            String guestName = (createOrderRequest.getGuestName() == null || createOrderRequest.getGuestName().trim().isEmpty())
+                    ? "Khách hàng ẩn danh"
+                    : createOrderRequest.getGuestName();
+            orderBuilder.guestName(guestName);
+        }
 
-    // Tính toán tổng tiền và tạo OrderItems
-    BigDecimal totalAmount = BigDecimal.ZERO;
+        Order order = orderBuilder.build();
+
+        // Tính toán tổng tiền và tạo OrderItems
+        BigDecimal totalAmount = BigDecimal.ZERO;
         BigDecimal finalTotalAmount = totalAmount;
         List<OrderItem> orderItems = createOrderRequest.getOrderItems().stream()
                 .map(itemRequest -> {
@@ -122,16 +124,62 @@ public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
                 })
                 .collect(Collectors.toList());
 
-    order.setOrderItems(orderItems);
-    totalAmount = orderItems.stream()
+        order.setOrderItems(orderItems);
+        totalAmount = orderItems.stream()
                 .map(OrderItem::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    order.setTotalAmount(totalAmount);
-    // Lưu đơn hàng vào cơ sở dữ liệu
-    Order savedOrder = orderRepository.save(order);
-    return mapOrderToOrderResponse(savedOrder);
-}
+        order.setTotalAmount(totalAmount);
+        // Lưu đơn hàng vào cơ sở dữ liệu
+        Order savedOrder = orderRepository.save(order);
+        return mapOrderToOrderResponse(savedOrder);
+    }
 
+    // Update đơn hàng
+    @Transactional
+    @Override
+    public OrderResponse updateOrder(Long id, CreateOrderRequest updateRequest) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        // Cập nhật thông tin đơn hàng
+        order.setShippingAddress(updateRequest.getShippingAddress());
+        order.setShippingPhone(updateRequest.getShippingPhone());
+        order.setNotes(updateRequest.getNotes());
+        order.setUpdatedAt(LocalDateTime.now());
+
+        // Cập nhật danh sách sản phẩm trong đơn hàng
+        List<OrderItem> updatedOrderItems = updateRequest.getOrderItems().stream()
+                .map(itemRequest -> {
+                    Product product = productRepository.findById(itemRequest.getProductId())
+                            .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+                    BigDecimal price = product.getPrice();
+                    BigDecimal subTotal = price.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+                    return OrderItem.builder()
+                            .order(order)
+                            .product(product)
+                            .quantity(itemRequest.getQuantity())
+                            .price(price)
+                            .subTotal(subTotal)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        // Xóa các OrderItem cũ và thêm các OrderItem mới
+        orderItemRepository.deleteAll(order.getOrderItems());
+        order.setOrderItems(updatedOrderItems);
+
+        // Tính toán lại tổng tiền
+        BigDecimal totalAmount = updatedOrderItems.stream()
+                .map(OrderItem::getSubTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        order.setTotalAmount(totalAmount);
+
+        // Lưu đơn hàng đã cập nhật
+        Order updatedOrder = orderRepository.save(order);
+        return mapOrderToOrderResponse(updatedOrder);
+    }
+
+    // Lấy đơn hàng bằng id
     @Override
     public OrderResponse getOrderById(Long id) {
         Order order = orderRepository.findById(id)
@@ -139,6 +187,7 @@ public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         return mapOrderToOrderResponse(order);
     }
 
+    // Lấy danh sách đơn hàng bằng userId
     @Override
     public List<OrderResponse> getOrdersByUserId(Long userId) {
         User user = userRepository.findById(userId)
@@ -146,6 +195,7 @@ public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         return getOrdersByUser(user); // Gọi phương thức hiện có
     }
 
+    // Lấy danh sách đơn hàng bằng User
     @Override
     public List<OrderResponse> getOrdersByUser(User user) {
         List<Order> orders = orderRepository.findByUser(user);
@@ -154,6 +204,7 @@ public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
                 .collect(Collectors.toList());
     }
 
+    // Lấy tất cả đơn hàng
     @Override
     public List<OrderResponse> getAllOrders() {
         return orderRepository.findAll().stream()
@@ -161,6 +212,7 @@ public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
                 .collect(Collectors.toList());
     }
 
+    // Cập nhật tràng thái đơn hàng
     @Override
     public OrderResponse updateOrderStatus(Long id, String status) {
         Order order = orderRepository.findById(id)
@@ -174,6 +226,7 @@ public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         return mapOrderToOrderResponse(updatedOrder);
     }
 
+    // Xóa đơn hàng
     @Override
     public void deleteOrder(Long id) {
         if (!orderRepository.existsById(id)) {
@@ -181,6 +234,61 @@ public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         }
         orderRepository.deleteById(id);
     }
+
+    // Cập nhật trạng thái Processing
+    @Override
+    public void processOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(OrderStatus.PROCESSING);
+        orderRepository.save(order);
+    }
+
+    // Cập nhật trạng thái SHIPPED
+    @Override
+    public void shippedOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(OrderStatus.SHIPPED);
+        orderRepository.save(order);
+    }
+
+    // Cập nhật trạng thái DELIVERED
+    @Override
+    public void deliveredOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(OrderStatus.DELIVERED);
+        orderRepository.save(order);
+    }
+
+    // Cập nhật trạng thái CANCELLED
+    @Override
+    public void cancelledOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
+    }
+
+    // Cập nhật trạng thái PAID
+    @Override
+    public void paidOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(OrderStatus.PAID);
+        orderRepository.save(order);
+    }
+
+    // Cập nhật trạng thái REFUND
+    @Override
+    public void refundOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(OrderStatus.REFUND);
+        orderRepository.save(order);
+    }
+
 
     private OrderResponse mapOrderToOrderResponse(Order order) {
         UserResponse userResponse = order.getUser() != null

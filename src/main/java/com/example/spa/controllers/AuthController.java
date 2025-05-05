@@ -8,6 +8,7 @@ import com.example.spa.dto.request.UserRegisterRequest;
 import com.example.spa.dto.request.UserRequest;
 import com.example.spa.dto.response.GetUserResponse;
 import com.example.spa.dto.response.UserResponse;
+import com.example.spa.exception.AppException;
 import com.example.spa.services.UserService;
 import com.example.spa.servicesImpl.OtpService;
 import com.example.spa.utils.JwtUtil;
@@ -179,7 +180,7 @@ public class AuthController {
 
     //Reset password
     @PostMapping("/reset-password")
-    @Operation(summary = "Reset mật khẩu", description = "Thay đ��i mật khẩu")
+    @Operation(summary = "Reset mật khẩu", description = "Thay đổi mật khẩu")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "400", description = "Không hợp lệ")})
     public ResultResponse<?> resetPassword(@RequestBody Map<String, String> request) {
@@ -195,6 +196,25 @@ public class AuthController {
             return ResultResponse.builder().message(e.getMessage()).build();
         }
     }
+
+    @PutMapping("/change-password")
+    @Operation(summary = "Đổi mật khẩu", description = "Đổi mật khẩu bằng cách nhập mật khẩu cũ và mật khẩu mới")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Đổi mật khẩu thành công"),
+            @ApiResponse(responseCode = "400", description = "Mật khẩu cũ không hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Người dùng không tồn tại")
+    })
+    public ResponseEntity<String> changePassword(@RequestParam Long userId,
+                                                 @RequestParam String oldPassword,
+                                                 @RequestParam String newPassword) {
+        try {
+            String response = userService.changePassword(userId, oldPassword, newPassword);
+            return ResponseEntity.ok(response);
+        } catch (AppException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 
     // Get all users
     @GetMapping("/all")

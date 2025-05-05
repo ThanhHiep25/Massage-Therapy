@@ -20,6 +20,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    // Tạo đơn hàng mới
     @PostMapping("/create")
     @Operation(summary = "Tạo đơn hàng mới", description = "Thêm đơn hàng mới")
     @ApiResponses(value = {
@@ -31,6 +32,19 @@ public class OrderController {
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }
 
+    // Cập nhật thông tin đơn hàng
+    @PutMapping("/{id}")
+    @Operation(summary = "Cap nhat thong tin don hang", description = "Cap nhat thong tin don hang")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cap nhat thanh cong"),
+            @ApiResponse(responseCode = "400", description = "Du lieu khong hop le")
+    })
+    public ResponseEntity<OrderResponse> updateOrder(@PathVariable Long id, @RequestBody CreateOrderRequest updateRequest) {
+        OrderResponse updatedOrder = orderService.updateOrder(id, updateRequest);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    // Lấy thống tin đơn hàng theo id
     @GetMapping("/{id}")
     @Operation(summary = "Lay thong tin don hang theo id", description = "Lay thong tin don hang theo id")
     @ApiResponses(value = {
@@ -42,6 +56,7 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
+    // Lấy thống tin đơn hàng theo id nguoi dung
     @GetMapping("/users/{userId}")
     @Operation(summary = "Lay thong tin don hang theo id nguoi dung", description = "Lay thong tin don hang theo id nguoi dung")
     @ApiResponses(value = {
@@ -53,6 +68,7 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    // Lấy thống tin đơn hàng
     @GetMapping
     @Operation(summary = "Lay thong tin don hang", description = "Lay thong tin don hang")
     @ApiResponses(value = {
@@ -64,6 +80,7 @@ public class OrderController {
         return ResponseEntity.ok(allOrders);
     }
 
+    // Cap nhat trang thai don hang
     @PutMapping("/{id}/status")
     @Operation(summary = "Cap nhat trang thai don hang", description = "Cap nhat trang thai don hang")
     @ApiResponses(value = {
@@ -75,6 +92,79 @@ public class OrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
+    // Cập nhật trạng thái Processing
+    @PutMapping("/{id}/processing")
+    @Operation(summary = "Cap nhat trang thai Processing", description = "Cap nhat trang thai Processing")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cap nhat thanh cong"),
+            @ApiResponse(responseCode = "404", description = "Khong tim thay don hang")
+    })
+    public ResponseEntity<?> updateOrderProcessing(@PathVariable Long id) {
+        orderService.processOrder(id);
+        return ResponseEntity.ok("Chuyển trạng thái Processing");
+    }
+
+    // Cập nhật trạng thái SHIPPED
+    @PutMapping("/{id}/shipped")
+    @Operation(summary = "Cap nhat trang thai SHIPPED", description = "Cap nhat trang thai SHIPPED")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cap nhat thanh cong"),
+            @ApiResponse(responseCode = "404", description = "Khong tim thay don hang")
+    })
+    public ResponseEntity<?> updateOrderShipped(@PathVariable Long id) {
+        orderService.shippedOrder(id);
+        return ResponseEntity.ok("Chuyển trạng thái SHIPPED");
+    }
+
+    // Cập nhật trạng thái DELIVERED
+    @PutMapping("/{id}/delivered")
+    @Operation(summary = "Cap nhat trang thai DELIVERED", description = "Cap nhat trang thai DELIVERED")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cap nhat thanh cong"),
+            @ApiResponse(responseCode = "404", description = "Khong tim thay don hang")
+    })
+    public ResponseEntity<?> updateOrderDelivered(@PathVariable Long id) {
+        orderService.deliveredOrder(id);
+        return ResponseEntity.ok("Chuyển trạng thái DELIVERED");
+    }
+
+    // Cập nhật trạng thái CANCELLED
+    @PutMapping("/{id}/cancelled")
+    @Operation(summary = "Cap nhat trang thai CANCELLED", description = "Cap nhat trang thai CANCELLED")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cap nhat thanh cong"),
+            @ApiResponse(responseCode = "404", description = "Khong tim thay don hang")
+    })
+    public ResponseEntity<?> updateOrderCancelled(@PathVariable Long id) {
+        orderService.cancelledOrder(id);
+        return ResponseEntity.ok("Chuyển trạng thái CANCELLED");
+    }
+
+    // Cập nhật trạng thái PAID
+    @PutMapping("/{id}/paid")
+    @Operation(summary = "Cap nhat trang thai PAID", description = "Cap nhat trang thai PAID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cap nhat thanh cong"),
+            @ApiResponse(responseCode = "404", description = "Khong tim thay don hang")
+    })
+    public ResponseEntity<?> updateOrderPaid(@PathVariable Long id) {
+        orderService.paidOrder(id);
+        return ResponseEntity.ok("Chuyển trạng thái PAID");
+    }
+
+    // Cập nhật trạng thái REFUND
+    @PutMapping("/{id}/refund")
+    @Operation(summary = "Cap nhat trang thai REFUND", description = "Cap nhat trang thai REFUND")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cap nhat thanh cong"),
+            @ApiResponse(responseCode = "404", description = "Khong tim thay don hang")
+    })
+    public ResponseEntity<?> updateOrderRefund(@PathVariable Long id) {
+        orderService.refundOrder(id);
+        return ResponseEntity.ok("Chuyển trạng thái REFUND");
+    }
+
+    // Xoa don hang
     @DeleteMapping("/{id}")
     @Operation(summary = "Xoa don hang", description = "Xoa don hang")
     @ApiResponses(value = {

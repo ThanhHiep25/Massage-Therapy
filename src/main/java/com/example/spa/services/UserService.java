@@ -47,6 +47,8 @@ public interface UserService {
 
     String resetPassword(String email, String otp, String newPassword);
 
+    String changePassword(Long userId, String oldPassword, String newPassword);
+
     List<User> getAllUsers();
 
     List<User> getAllCustomers();

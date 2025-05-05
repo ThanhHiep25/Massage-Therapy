@@ -3,7 +3,6 @@ package com.example.spa.servicesImpl;
 import com.example.spa.dto.request.UserLoginRequest;
 import com.example.spa.dto.request.UserRegisterRequest;
 import com.example.spa.dto.request.UserRequest;
-import com.example.spa.dto.response.GetUserResponse;
 import com.example.spa.dto.response.UserLoginResponse;
 import com.example.spa.dto.response.UserResponse;
 import com.example.spa.entities.Role;
@@ -258,6 +257,25 @@ public class UserServiceImpl implements UserService {
         otpService.clearPendingUser(email);
 
         return "Đặt lại mật khẩu thành công";
+    }
+
+    // Đổi mật khẻu
+    @Override
+    public String changePassword(Long userId, String oldPassword, String newPassword) {
+        // Tìm kiếm người dùng theo ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Kiểm tra mật khẩu cũ có khớp không
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_INVALID);
+        }
+
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return "Đổi mật khẩu thành công";
     }
 
     // Lấy tất cả danh sách
