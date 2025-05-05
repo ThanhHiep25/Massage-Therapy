@@ -91,14 +91,11 @@ public class AppointmentServiceImpl implements AppointmentService {
                     .guestName(guestName);
 
         }
-
-
-        Appointment saved = appointmentRepository.save(appointmentBuilder.build());
-
-//        notificationService.sendAppointmentNotification(new AppointmentResponse(saved));
+//        notificationService.sendAppointmentNotification(new AppointmentResponse(appointmentBuilder.build()));
 //
 //        notificationService.sendAppointmentNotificationCustomer();
 
+        Appointment saved = appointmentRepository.save(appointmentBuilder.build());
         return new AppointmentResponse(saved);
     }
 

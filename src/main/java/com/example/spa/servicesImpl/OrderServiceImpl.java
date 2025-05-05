@@ -29,20 +29,81 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    @Override
-    @Transactional
-    public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+//    @Override
+//    @Transactional
+//    public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+//        User user = userRepository.findById(createOrderRequest.getUserId())
+//                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+//
+//        Order order = Order.builder()
+//                .shippingAddress(createOrderRequest.getShippingAddress())
+//                .shippingPhone(createOrderRequest.getShippingPhone())
+//                .notes(createOrderRequest.getNotes())
+//                .build();
+//
+//        BigDecimal totalAmount = BigDecimal.ZERO;
+//        BigDecimal finalTotalAmount = totalAmount;
+//        List<OrderItem> orderItems = createOrderRequest.getOrderItems().stream()
+//                .map(itemRequest -> {
+//                    Product product = productRepository.findById(itemRequest.getProductId())
+//                            .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+//                    BigDecimal price = product.getPrice();
+//                    BigDecimal subTotal = price.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+//                    finalTotalAmount.add(subTotal); // Cẩn thận với việc cộng trực tiếp trong stream
+//                    return OrderItem.builder()
+//                            .order(order)
+//                            .product(product)
+//                            .quantity(itemRequest.getQuantity())
+//                            .price(price)
+//                            .subTotal(subTotal)
+//                            .build();
+//                })
+//                .collect(Collectors.toList());
+//
+//        order.setOrderItems(orderItems);
+//        // Tính toán lại totalAmount sau khi tạo OrderItems để tránh vấn đề với stream
+//        totalAmount = orderItems.stream()
+//                .map(OrderItem::getSubTotal)
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//        order.setTotalAmount(totalAmount);
+//        order.setOrderDate(LocalDateTime.now());
+//        order.setCreatedAt(LocalDateTime.now());
+//        order.setUpdatedAt(LocalDateTime.now());
+//        order.setStatus(OrderStatus.PENDING);
+//
+//        Order savedOrder = orderRepository.save(order);
+//
+//        return mapOrderToOrderResponse(savedOrder);
+//    }
+@Override
+@Transactional
+public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+    Order.OrderBuilder orderBuilder = Order.builder()
+            .shippingAddress(createOrderRequest.getShippingAddress())
+            .shippingPhone(createOrderRequest.getShippingPhone())
+            .notes(createOrderRequest.getNotes())
+            .orderDate(LocalDateTime.now())
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .status(OrderStatus.PENDING);
+
+    // Kiểm tra nếu có userId thì gán User, nếu không thì xử lý khách hàng ẩn danh
+    if (createOrderRequest.getUserId() != null) {
         User user = userRepository.findById(createOrderRequest.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        orderBuilder.user(user);
+    } else {
+        // Xử lý khách hàng ẩn danh
+        String guestName = (createOrderRequest.getGuestName() == null || createOrderRequest.getGuestName().trim().isEmpty())
+                ? "Khách hàng ẩn danh"
+                : createOrderRequest.getGuestName();
+        orderBuilder.guestName(guestName);
+    }
 
-        Order order = Order.builder()
-                .user(user)
-                .shippingAddress(createOrderRequest.getShippingAddress())
-                .shippingPhone(createOrderRequest.getShippingPhone())
-                .notes(createOrderRequest.getNotes())
-                .build();
+    Order order = orderBuilder.build();
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
+    // Tính toán tổng tiền và tạo OrderItems
+    BigDecimal totalAmount = BigDecimal.ZERO;
         BigDecimal finalTotalAmount = totalAmount;
         List<OrderItem> orderItems = createOrderRequest.getOrderItems().stream()
                 .map(itemRequest -> {
@@ -61,21 +122,15 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .collect(Collectors.toList());
 
-        order.setOrderItems(orderItems);
-        // Tính toán lại totalAmount sau khi tạo OrderItems để tránh vấn đề với stream
-        totalAmount = orderItems.stream()
+    order.setOrderItems(orderItems);
+    totalAmount = orderItems.stream()
                 .map(OrderItem::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.setTotalAmount(totalAmount);
-        order.setOrderDate(LocalDateTime.now());
-        order.setCreatedAt(LocalDateTime.now());
-        order.setUpdatedAt(LocalDateTime.now());
-        order.setStatus(OrderStatus.PENDING);
-
-        Order savedOrder = orderRepository.save(order);
-
-        return mapOrderToOrderResponse(savedOrder);
-    }
+    order.setTotalAmount(totalAmount);
+    // Lưu đơn hàng vào cơ sở dữ liệu
+    Order savedOrder = orderRepository.save(order);
+    return mapOrderToOrderResponse(savedOrder);
+}
 
     @Override
     public OrderResponse getOrderById(Long id) {
@@ -128,9 +183,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderResponse mapOrderToOrderResponse(Order order) {
+        UserResponse userResponse = order.getUser() != null
+                ? new UserResponse(order.getUser())
+                : null;
+
         return OrderResponse.builder()
                 .id(order.getId())
-                .user(mapUserToUserResponse(order.getUser()))
+                .user(userResponse)
+                .guestName(order.getGuestName())
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())

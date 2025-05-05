@@ -1,0 +1,26 @@
+package com.example.spa.dto.response;
+
+
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class PaymentOrderResponse {
+    private Long id;
+    private String paymentMethod;
+    private OrderResponse order;
+    private String transactionId;
+    private BigDecimal amount;
+    private LocalDateTime paymentDate;
+    private LocalDateTime transactionTime;
+    private String bankCode;
+    private String status;
+    private String note;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}

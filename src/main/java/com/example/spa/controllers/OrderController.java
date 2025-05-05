@@ -20,7 +20,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping
+    @PostMapping("/create")
     @Operation(summary = "Tạo đơn hàng mới", description = "Thêm đơn hàng mới")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tạo thành công"),

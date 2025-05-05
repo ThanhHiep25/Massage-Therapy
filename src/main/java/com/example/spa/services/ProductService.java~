@@ -3,7 +3,6 @@ package com.example.spa.services;
 import com.example.spa.dto.request.ProductRequest;
 import com.example.spa.dto.response.ProductResponse;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
@@ -28,7 +27,4 @@ public interface ProductService {
 
     // thống kê số lượng sản phẩm
     long countProduct();
-
-    // Xuất Excel
-    byte[] exportProductListToExcel(List<ProductResponse> products) throws IOException;
 }

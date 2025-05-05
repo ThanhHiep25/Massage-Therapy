@@ -1,6 +1,7 @@
 package com.example.spa.controllers;
 
 import com.example.spa.dto.request.ProductRequest;
+import com.example.spa.dto.response.AppointmentResponse;
 import com.example.spa.dto.response.ProductResponse;
 import com.example.spa.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,10 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -30,7 +36,7 @@ public class ProductController {
     )
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest) {
         ProductResponse createdProduct = productService.createProduct(productRequest);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+        return ResponseEntity.ok(createdProduct);
     }
 
     @PutMapping("/{id}")
@@ -78,8 +84,8 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/activate")
-    @Operation(summary = "Kiểm tra lịch hẹn", description = "Kiểm tra lịch hẹn")
+    @PutMapping("/{id}/activate")
+    @Operation(summary = "Activate lịch hẹn", description = "Kiểm tra lịch hẹn")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
@@ -89,8 +95,8 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}/sale")
-    @Operation(summary = "Kiểm tra lịch hẹn", description = "Kiểm tra lịch hẹn")
+    @PutMapping("/{id}/sale")
+    @Operation(summary = "Sale sản phẩm", description = "Sale sản phẩm")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
@@ -100,7 +106,7 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}/sale/{quantity}")
+    @PutMapping("/{id}/sale/{quantity}")
     @Operation(summary = "Kiểm tra lịch hẹn", description = "Kiểm tra lịch hẹn")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
@@ -111,7 +117,7 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}/deactivate")
+    @PutMapping("/{id}/deactivate")
     @Operation(summary = "Kiểm tra lịch hẹn", description = "Kiểm tra lịch hẹn")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
@@ -120,6 +126,41 @@ public class ProductController {
     public ResponseEntity<Void> deactivateProduct(@PathVariable Long id) {
         productService.deactivateProduct(id);
         return ResponseEntity.ok().build();
+    }
+
+    // Thống kê số lượng sản phẩm
+    @GetMapping("/count")
+    @Operation(summary = "Thống kê số lượng sản phẩm", description = "Trả về tất cả lịch hẹn")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    }
+    )
+    public ResponseEntity<?> countProduct() {
+        return ResponseEntity.ok(productService.countProduct());
+    }
+
+    // Xuat danh sach sản phẩm
+    @GetMapping("/export/excel")
+    @Operation(summary = "Xuat danh sach san pham thanh file excel", description = "Xuat danh sach san pham thanh file excel")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public ResponseEntity<byte[]> exportAppointmentsToExcel() throws IOException {
+        List<ProductResponse> products = productService.getAllProducts();
+        byte[] excelBytes = productService.exportProductListToExcel(products);
+
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String fileName = "DanhSachSanPham_" + formatter.format(now) + ".xlsx";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDispositionFormData("attachment", fileName);
+        headers.setContentLength(excelBytes.length);
+
+        return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.spa.dto.response;
 
 import com.example.spa.entities.Categories;
+import com.example.spa.entities.Product;
 import com.example.spa.enums.ProductStatus;
 import lombok.*;
 
@@ -24,6 +25,19 @@ public class ProductResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private ProductStatus productStatus;
+
+    public ProductResponse(Product product) {
+        this.id = product.getId();
+        this.nameProduct = product.getNameProduct();
+        this.description = product.getDescription();
+        this.price = product.getPrice();
+        this.category = new CategoryResponse(product.getCategory());
+        this.imageUrl = product.getImageUrl();
+        this.quantity = product.getQuantity();
+        this.createdAt = product.getCreatedAt();
+        this.updatedAt = product.getUpdatedAt();
+        this.productStatus = product.getProductStatus();
+    }
 
     @Override
     public String toString() {

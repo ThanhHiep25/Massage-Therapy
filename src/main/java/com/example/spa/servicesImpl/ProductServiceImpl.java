@@ -9,12 +9,19 @@ import com.example.spa.enums.ProductStatus;
 import com.example.spa.exception.AppException;
 import com.example.spa.exception.ErrorCode;
 import com.example.spa.repositories.CategoryRepository;
+import com.example.spa.repositories.OrderItemRepository;
 import com.example.spa.repositories.ProductRepository;
 import com.example.spa.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,11 +31,17 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoriesRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Override
     public ProductResponse createProduct(ProductRequest request) {
         Categories categoryEntity = categoriesRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        // Kiểm tra tên sản phẩm trùng
+        if (productRepository.existsByNameProduct(request.getNameProduct())) {
+            throw new AppException(ErrorCode.PRODUCT_ALREADY_EXISTED);
+        }
 
         Product product = Product.builder()
                 .nameProduct(request.getNameProduct())
@@ -175,6 +188,10 @@ public class ProductServiceImpl implements ProductService {
         if (!productRepository.existsById(id)) {
             throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
         }
+        // Check xem sản phẩm có được đặt chưa mới tiến hành xóa
+        if (orderItemRepository.existsByProduct_Id(id)) {
+            throw new AppException(ErrorCode.PRODUCT_CANNOT_BE_DELETED_DUE_TO_ORDERS);
+        }
         productRepository.deleteById(id);
     }
 
@@ -221,4 +238,86 @@ public class ProductServiceImpl implements ProductService {
     public long countProduct() {
         return productRepository.count();
     }
+
+    // Xuất Excel
+    @Override
+    public byte[] exportProductListToExcel(List<ProductResponse> products) throws IOException {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Danh sách sản phẩm");
+
+        // Style cho header
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        setBorder(headerStyle);
+
+        // Style cho data
+        CellStyle dataStyle = workbook.createCellStyle();
+        setBorder(dataStyle);
+
+        // Tạo header row
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"ID", "Tên sản phẩm", "Mô tả", "Giá", "Số lượng", "Danh mục", "Trạng thái", "Ngày tạo", "Ngày cập nhật"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Đổ dữ liệu sản phẩm vào các row
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        int rowNum = 1;
+        for (ProductResponse product : products) {
+            Row row = sheet.createRow(rowNum++);
+            createCell(row, 0, product.getId(), dataStyle);
+            createCell(row, 1, product.getNameProduct(), dataStyle);
+            createCell(row, 2, product.getDescription() != null ? product.getDescription() : "Trống", dataStyle);
+            createCell(row, 3, product.getPrice() != null ? product.getPrice().toString() : "0.0", dataStyle);
+            createCell(row, 4, product.getQuantity(), dataStyle);
+            createCell(row, 5, product.getCategory() != null ? product.getCategory().getName() : "Trống", dataStyle);
+            createCell(row, 6, product.getProductStatus() != null ? product.getProductStatus().name() : "", dataStyle);
+            createCell(row, 7, product.getCreatedAt() != null ? product.getCreatedAt().format(formatter) : "", dataStyle);
+            createCell(row, 8, product.getUpdatedAt() != null ? product.getUpdatedAt().format(formatter) : "", dataStyle);
+        }
+
+        // Auto size các cột cho vừa nội dung
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Thêm bộ lọc
+        sheet.setAutoFilter(new CellRangeAddress(0, products.size(), 0, headers.length - 1));
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+
+        return outputStream.toByteArray();
+    }
+
+    private void createCell(Row row, int column, Object value, CellStyle style) {
+        Cell cell = row.createCell(column);
+        if (value != null) {
+            cell.setCellValue(value.toString());
+        } else {
+            cell.setCellValue("");
+        }
+        cell.setCellStyle(style);
+    }
+
+    private void setBorder(CellStyle style) {
+        style.setBorderTop(BorderStyle.THIN);
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderRight(BorderStyle.THIN);
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+    }
+
 }

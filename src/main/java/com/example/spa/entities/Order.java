@@ -26,8 +26,11 @@ public class Order {
 
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
+
+    @Column(name = "guest_name")
+    private String guestName;
 
     @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate = LocalDateTime.now();

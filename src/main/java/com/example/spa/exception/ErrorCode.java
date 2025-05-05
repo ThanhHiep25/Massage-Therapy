@@ -120,10 +120,10 @@ public enum ErrorCode {
     PRODUCT_DELETED(1000, "Product deleted successfully", HttpStatus.NO_CONTENT),
     PRODUCT_ALREADY_EXISTED(1006, "Product name already existed", HttpStatus.BAD_REQUEST),
     PRODUCT_OUT_OF_STOCK(1010, "Product out of stock", HttpStatus.BAD_REQUEST),
-
+    PRODUCT_CANNOT_BE_DELETED_DUE_TO_ORDERS(1006, "Product cannot be deleted due to orders" , HttpStatus.BAD_REQUEST),
 
     ORDER_NOT_FOUND(404,"Order not found" ,HttpStatus.NOT_FOUND ),
-    INVALID_ORDER_STATUS(1010, "Invalid order status", HttpStatus.BAD_REQUEST),
+    INVALID_ORDER_STATUS(1010, "Invalid order status", HttpStatus.BAD_REQUEST)
 
 
     ;
