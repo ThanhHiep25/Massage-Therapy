@@ -125,42 +125,46 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
     public ServiceSpa updateServiceSpa(Long id, ServiceSpaRequest request, List<ServiceStep> steps) {
         ServiceSpa existingService = getServiceSpaById(id);
 
-        // Kiem tra xem category co ton tai hay khong
+        // Update category if provided
         if (request.getCategoryId() != null) {
             Categories category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
             existingService.setCategories(category);
         }
 
+        // Update basic fields
         existingService.setName(request.getName());
         existingService.setDescription(request.getDescription());
         existingService.setPrice(request.getPrice());
         existingService.setDuration(request.getDuration());
         existingService.setService_type(request.getServiceType());
 
-        // Cập nhật danh sách ServiceStep
-        List<ServiceStep> existingSteps = serviceStepRepository.findByServiceSpa(existingService);
-        existingSteps.removeIf(step -> !steps.contains(step));
-        serviceStepRepository.deleteAll(existingSteps);
+        // Update steps
+        if (steps != null) {
+            // Remove steps that are not in the new list
+            List<ServiceStep> existingSteps = serviceStepRepository.findByServiceSpa(existingService);
+            List<Long> newStepIds = steps.stream()
+                    .map(ServiceStep::getStep_id)
+                    .collect(Collectors.toList());
+            existingSteps.stream()
+                    .filter(step -> !newStepIds.contains(step.getStep_id()))
+                    .forEach(serviceStepRepository::delete);
 
-        steps.forEach(step -> step.setServiceSpa(existingService));
-        serviceStepRepository.saveAll(steps);
-
-        // Cập nhật danh sách ảnh
-        if (request.getImageUrls() != null) {
-            // Xóa ảnh cũ trước khi thêm ảnh mới
-            serviceSpaImageRepository.deleteByServiceSpa(existingService);
-
-            List<ServiceSpaImage> newImages = request.getImageUrls().stream()
-                    .map(url -> ServiceSpaImage.builder()
-                            .imageUrl(url)
-                            .serviceSpa(existingService)
-                            .build())
-                    .toList();
-
-            serviceSpaImageRepository.saveAll(newImages);
-            existingService.setImages(newImages);
+            // Update or add new steps
+            for (ServiceStep step : steps) {
+                if (step.getStep_id() != null) {
+                    ServiceStep existingStep = serviceStepRepository.findById(step.getStep_id())
+                            .orElseThrow(() -> new AppException(ErrorCode.STEP_NOT_FOUND));
+                    existingStep.setStepOrder(step.getStepOrder());
+                    existingStep.setDescription(step.getDescription());
+                    serviceStepRepository.save(existingStep);
+                } else {
+                    step.setServiceSpa(existingService);
+                    serviceStepRepository.save(step);
+                }
+            }
         }
+
 
         return serviceSpaRepository.save(existingService);
     }

@@ -5,6 +5,7 @@ import com.example.spa.dto.response.OrderResponse;
 import com.example.spa.entities.User;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface OrderService {
@@ -40,4 +41,6 @@ public interface OrderService {
 
     // Cập nhật trạng thái REFUND
     void refundOrder(Long id);
+
+    byte[] exportOrdersToExcel(List<OrderResponse> orders) throws IOException;
 }

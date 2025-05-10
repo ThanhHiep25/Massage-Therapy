@@ -377,6 +377,8 @@ public class UserServiceImpl implements UserService {
                 .phone(user.getPhone())
                 .name(user.getName())
                 .address(user.getAddress())
+                .gender(user.getGender())
+                .dateOfBirth(user.getDateOfBirth())
                 .imageUrl(user.getImageUrl())
                 .description(user.getDescription())
                 .role(user.getRole().getRoleName())

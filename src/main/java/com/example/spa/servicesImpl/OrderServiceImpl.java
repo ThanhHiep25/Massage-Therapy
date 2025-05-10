@@ -12,11 +12,16 @@ import com.example.spa.repositories.ProductRepository;
 import com.example.spa.repositories.UserRepository;
 import com.example.spa.services.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -145,34 +150,34 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingAddress(updateRequest.getShippingAddress());
         order.setShippingPhone(updateRequest.getShippingPhone());
         order.setNotes(updateRequest.getNotes());
-        order.setUpdatedAt(LocalDateTime.now());
+        //order.setUpdatedAt(LocalDateTime.now());
 
         // Cập nhật danh sách sản phẩm trong đơn hàng
-        List<OrderItem> updatedOrderItems = updateRequest.getOrderItems().stream()
-                .map(itemRequest -> {
-                    Product product = productRepository.findById(itemRequest.getProductId())
-                            .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-                    BigDecimal price = product.getPrice();
-                    BigDecimal subTotal = price.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
-                    return OrderItem.builder()
-                            .order(order)
-                            .product(product)
-                            .quantity(itemRequest.getQuantity())
-                            .price(price)
-                            .subTotal(subTotal)
-                            .build();
-                })
-                .collect(Collectors.toList());
-
-        // Xóa các OrderItem cũ và thêm các OrderItem mới
-        orderItemRepository.deleteAll(order.getOrderItems());
-        order.setOrderItems(updatedOrderItems);
-
-        // Tính toán lại tổng tiền
-        BigDecimal totalAmount = updatedOrderItems.stream()
-                .map(OrderItem::getSubTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        order.setTotalAmount(totalAmount);
+//        List<OrderItem> updatedOrderItems = updateRequest.getOrderItems().stream()
+//                .map(itemRequest -> {
+//                    Product product = productRepository.findById(itemRequest.getProductId())
+//                            .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+//                    BigDecimal price = product.getPrice();
+//                    BigDecimal subTotal = price.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+//                    return OrderItem.builder()
+//                            .order(order)
+//                            .product(product)
+//                            .quantity(itemRequest.getQuantity())
+//                            .price(price)
+//                            .subTotal(subTotal)
+//                            .build();
+//                })
+//                .collect(Collectors.toList());
+//
+//        // Xóa các OrderItem cũ và thêm các OrderItem mới
+//        orderItemRepository.deleteAll(order.getOrderItems());
+//        order.setOrderItems(updatedOrderItems);
+//
+//        // Tính toán lại tổng tiền
+//        BigDecimal totalAmount = updatedOrderItems.stream()
+//                .map(OrderItem::getSubTotal)
+//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+//        order.setTotalAmount(totalAmount);
 
         // Lưu đơn hàng đã cập nhật
         Order updatedOrder = orderRepository.save(order);
@@ -289,6 +294,92 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
+    @Override
+    public byte[] exportOrdersToExcel(List<OrderResponse> orders) throws IOException {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Orders");
+
+        // Style cho header
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.DARK_GREEN.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        setBorder(headerStyle);
+
+        // Style cho data
+        CellStyle dataStyle = workbook.createCellStyle();
+        setBorder(dataStyle);
+
+        // Tạo header row
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"Mã đơn hàng", "Người dùng", "Khách hàng", "Ngày đặt hàng", "Tổng tiền", "Trạng thái", "Địa chỉ giao hàng", "Số điện thoại giao hàng", "Ghi chú", "Sản phẩm", "Ngày tạo", "Ngày cập nhật"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Create data rows
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        int rowNum = 1;
+        for (OrderResponse order : orders) {
+            Row row = sheet.createRow(rowNum++);
+            createCell(row, 0, order.getId(), dataStyle);
+            createCell(row, 1, order.getUser() != null ? order.getUser().getName() : "Trống", dataStyle);
+            createCell(row, 2, order.getGuestName() != null ? order.getGuestName() : "Trống", dataStyle);
+            createCell(row, 3, order.getOrderDate() != null ? order.getOrderDate().format(formatter) : "", dataStyle);
+            createCell(row, 4, order.getTotalAmount() != null ? order.getTotalAmount().toString() : "0.0", dataStyle);
+            createCell(row, 5, order.getStatus() != null ? order.getStatus().name() : "", dataStyle);
+            createCell(row, 6, order.getShippingAddress() != null ? order.getShippingAddress() : "Trống", dataStyle);
+            createCell(row, 7, order.getShippingPhone() != null ? order.getShippingPhone() : "Trống", dataStyle);
+            createCell(row, 8, order.getNotes() != null ? order.getNotes() : "Trống", dataStyle);
+
+            // Liệt kê các sản phẩm trong đơn hàng
+            String productNames = order.getOrderItems().stream()
+                    .map(item -> item.getProduct().getNameProduct() + " (" + item.getQuantity() + ")")
+                    .collect(Collectors.joining(", "));
+            createCell(row, 9, productNames, dataStyle);
+
+            createCell(row, 10, order.getCreatedAt() != null ? order.getCreatedAt().format(formatter) : "", dataStyle);
+            createCell(row, 11, order.getUpdatedAt() != null ? order.getUpdatedAt().format(formatter) : "", dataStyle);
+        }
+
+        // Auto size columns
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+
+        return outputStream.toByteArray();
+    }
+
+    private void createCell(Row row, int column, Object value, CellStyle style) {
+        Cell cell = row.createCell(column);
+        if (value != null) {
+            cell.setCellValue(value.toString());
+        } else {
+            cell.setCellValue("");
+        }
+        cell.setCellStyle(style);
+    }
+
+    private void setBorder(CellStyle style) {
+        style.setBorderTop(BorderStyle.THIN);
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderRight(BorderStyle.THIN);
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+    }
+
 
     private OrderResponse mapOrderToOrderResponse(Order order) {
         UserResponse userResponse = order.getUser() != null
@@ -360,5 +451,7 @@ public class OrderServiceImpl implements OrderService {
                 .updatedAt(user.getUpdatedAt())
                 .build();
     }
+
+
 
 }

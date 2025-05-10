@@ -79,15 +79,9 @@ public class ServiceSpaController {
     })
     public ResponseEntity<?> updateServiceSpa(@PathVariable Long id,
                                                                @RequestBody ServiceSpaRequest request) {
-
-        try {
             List<ServiceStep> steps = request.getSteps(); // Lấy danh sách bước từ request
             ServiceSpa updatedService = serviceSpaService.updateServiceSpa(id, request, steps);
-            return ResponseEntity.ok(new AppException(ErrorCode.SERVICE_UPDATED));
-        }catch (AppException e){
-            return  ResponseEntity.status(400).body(new AppException(ErrorCode.SERVICE_ERROR));
-        }
-
+            return ResponseEntity.ok("ServiceSpa updated successfully");
     }
 
     @DeleteMapping("/{id}")

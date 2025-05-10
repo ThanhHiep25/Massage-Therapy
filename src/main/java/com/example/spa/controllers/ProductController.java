@@ -85,7 +85,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/activate")
-    @Operation(summary = "Activate lịch hẹn", description = "Kiểm tra lịch hẹn")
+    @Operation(summary = "activate sản phẩm", description = "activate sản phẩm")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
@@ -118,7 +118,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/deactivate")
-    @Operation(summary = "Kiểm tra lịch hẹn", description = "Kiểm tra lịch hẹn")
+    @Operation(summary = "deactivate sản phẩm", description = "deactivate sản phẩm")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")

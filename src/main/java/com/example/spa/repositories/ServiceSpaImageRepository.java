@@ -10,6 +10,5 @@ import java.util.List;
 @Repository
 public interface ServiceSpaImageRepository extends JpaRepository<ServiceSpaImage, Long> {
     List<ServiceSpaImage> findByServiceSpa_ServiceId(Long serviceId);
-
     void deleteByServiceSpa(ServiceSpa serviceSpa);
 }

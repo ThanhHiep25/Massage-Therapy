@@ -190,12 +190,12 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     })
     public ResponseEntity<byte[]> exportOrderToExcel() throws IOException {
-        List<OrderResponse> orderResponses = orderService.getAllOrders(); // Hoặc một phương thức khác để lấy danh sách lịch hẹn cần xuất
-        byte[] excelBytes = orderService.exportOrdersToExcel(orderResponses);
+        List<OrderResponse> appointments = appointmentService.getAllAppointments(); // Hoặc một phương thức khác để lấy danh sách lịch hẹn cần xuất
+        byte[] excelBytes = appointmentService.exportAppointmentsToExcel(appointments);
 
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-        String fileName = "DanhSachDonHang_" + formatter.format(now) + ".xlsx";
+        String fileName = "DanhSachLichHen_" + formatter.format(now) + ".xlsx";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
