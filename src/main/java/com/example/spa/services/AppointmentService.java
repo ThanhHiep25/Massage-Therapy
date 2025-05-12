@@ -57,5 +57,8 @@ public interface AppointmentService {
     // Thống kê tổng số lượng lịch hẹn
     long countAppointments();
 
+    // Thống kê số lượng đặt và tổng giá của từng dịch vụ
+    Map<String, Map<String, Object>> getServiceUsageWithTotalPrice();
+
     byte[] exportAppointmentsToExcel(List<AppointmentResponse> appointments) throws IOException;
 }

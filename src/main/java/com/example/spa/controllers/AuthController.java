@@ -63,6 +63,18 @@ public class AuthController {
         return ResponseEntity.ok(userService.register(user));
     }
 
+    // Đăng ký tạm thời cho nhân viên
+    @PostMapping("/register-staff")
+    @Operation(summary = "Đăng ký tài khoản", description = "Trả về thông tin tài khoản")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = " thông tin đăng ký hợp lệ"
+            ),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<?> registerStaff(@Valid @RequestBody UserRegisterRequest user) {
+        return ResponseEntity.ok(userService.registerStaff(user));
+    }
+
     // Verify OTP
     @Operation(summary = "Xác thực OTP", description = "Trả về thông báo xác thực")
     @ApiResponses(value = {
@@ -264,6 +276,21 @@ public class AuthController {
         return ResponseEntity.ok(responses);
     }
 
+    // Get all staff
+    @GetMapping("/staffs")
+    @Operation(summary = "Danh sách tất cả user theo role staff", description = "Trả về danh sách tất cả user theo role staff")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "400", description = "Không hợp lệ")
+    })
+    public ResponseEntity<List<UserResponse>> getAllStaff() {
+        List<UserResponse> responses = userService.getAllStaff()
+                .stream()
+                .map(UserResponse::new)
+//                .map(user -> new UserResponse((user)))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
+    }
 
     // Thông tin user theo id
     @GetMapping("/{id}")

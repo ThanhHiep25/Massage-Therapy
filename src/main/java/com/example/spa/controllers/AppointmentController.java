@@ -243,10 +243,20 @@ public class AppointmentController {
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
     }
     )
-   public ResponseEntity<?> countAll() {
+    public ResponseEntity<?> countAll() {
         return ResponseEntity.ok(appointmentService.countAppointments());
     }
 
+    @GetMapping("/service-usage-price")
+    @Operation(summary = "Thống kê tổng tổng từng lịch hẹn ", description = "Trả về tất cả lịch hẹn")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public ResponseEntity<Map<String, Map<String, Object>>> getServiceUsageWithTotalPrice() {
+        Map<String, Map<String, Object>> serviceUsage = appointmentService.getServiceUsageWithTotalPrice();
+        return ResponseEntity.ok(serviceUsage);
+    }
 
     @GetMapping("/export/excel")
     @Operation(summary = "Xuat danh sach lich hen thanh file excel", description = "Xuat danh sach lich hen thanh file excel")

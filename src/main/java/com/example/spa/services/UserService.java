@@ -19,6 +19,8 @@ import java.util.Map;
 public interface UserService {
     UserResponse register(UserRegisterRequest user);
 
+    UserResponse registerStaff(UserRegisterRequest user);
+
     UserResponse createUser(UserRegisterRequest request);
 
     Map<String, Object> login(UserLoginRequest request);
@@ -54,6 +56,8 @@ public interface UserService {
     List<User> getAllCustomers();
 
     List<User> getAllAdmins();
+
+    List<User> getAllStaff();
 
     List<User> getAllSuperAdmins();
 

@@ -177,6 +177,39 @@ public class ServiceSpaController {
         return ResponseEntity.ok("ServiceSpa activated successfully");
     }
 
+    //Lấy tổng số lượng dịch vụ spa
+    @GetMapping("/count")
+    @Operation(summary = "Thống kê số lượng dịch vụ spa", description = "Trả về số lịch hẹn")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public ResponseEntity<Long> countServiceSpa() {
+        return ResponseEntity.ok(serviceSpaService.countServiceSpa());
+    }
+
+    //Thống kê số lượng dịch vụ theo danh mục
+    @GetMapping("/count-by-category")
+    @Operation(summary = "Thống kê số lượng dịch vụ theo danh mục", description = "Trả về số lịch hẹn")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public ResponseEntity<Map<String, Long>> getServicesByCategory() {
+        return ResponseEntity.ok(serviceSpaService.getServicesByCategory());
+    }
+
+    //Thống kê số lượng dịch vụ theo danh mục (trả về name và value)
+    @GetMapping("/count-by-category-name")
+    @Operation(summary = "Thống kê số lượng dịch vụ theo danh mục", description = "Trả về số lịch hẹn")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public ResponseEntity<?> getServicesByCategoryName() {
+        return ResponseEntity.ok(serviceSpaService.getServicesByCategoryWithNameValue());
+    }
+
     @GetMapping("/export/excel")
     @Operation(summary = "Xuat danh sach dịch vụ spa thanh file excel", description = "Xuat danh sach dịch vụ spa thanh file excel")
     @ApiResponses(value = {

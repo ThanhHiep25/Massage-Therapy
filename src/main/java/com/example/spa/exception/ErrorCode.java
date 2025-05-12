@@ -128,7 +128,7 @@ public enum ErrorCode {
     INVALID_ORDER_STATUS(1010, "Invalid order status", HttpStatus.BAD_REQUEST),
 
 
-   ;
+    DISCOUNT_CODE_EXISTED(1006  , "Discount code existed", HttpStatus.BAD_REQUEST );
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;

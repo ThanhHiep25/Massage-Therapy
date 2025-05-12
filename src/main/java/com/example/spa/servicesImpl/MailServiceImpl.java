@@ -188,7 +188,7 @@ public class MailServiceImpl implements MailService {
                                                                 </div>
                                                             </div>
                             """,
-                    payment.getAppointment().getAppointmentId(),
+                    payment.getTransactionId(),
                     payment.getAppointment().getUser() != null ? payment.getAppointment().getUser().getName() : payment.getAppointment().getGuestName(),
                     payment.getPaymentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
                     payment.getPaymentMethod(),

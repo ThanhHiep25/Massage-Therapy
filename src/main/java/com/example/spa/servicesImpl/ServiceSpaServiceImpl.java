@@ -2,7 +2,6 @@ package com.example.spa.servicesImpl;
 
 import com.example.spa.dto.request.ServiceSpaRequest;
 import com.example.spa.dto.response.ServiceSpaResponse;
-import com.example.spa.dto.response.ServiceStepDTO;
 import com.example.spa.entities.Categories;
 import com.example.spa.entities.ServiceSpa;
 import com.example.spa.entities.ServiceSpaImage;
@@ -272,6 +271,32 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
             throw new AppException(ErrorCode.SERVICE_INVALID);
         }
     }
+
+    //Lấy tổng số lượng dịch vụ spa
+    @Override
+    public Long countServiceSpa() {
+        return serviceSpaRepository.count();
+    }
+
+    //Thống kê số lượng dịch vụ theo danh mục
+    @Override
+    public Map<String, Long> getServicesByCategory() {
+        return serviceSpaRepository.findAll().stream()
+                .collect(Collectors.groupingBy(service -> service.getCategories().getCategoryName(), Collectors.counting()));
+    }
+
+    //Thống kê số lượng dịch vụ theo danh mục (trả về name và value)
+    @Override
+    public List<Map.Entry<String, Long>> getServicesByCategoryWithNameValue() {
+        return serviceSpaRepository.findAll().stream()
+                .collect(Collectors.groupingBy(service -> service.getCategories().getCategoryName(), Collectors.counting()))
+                .entrySet()
+                .stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+
 
     // Xuat file excel
     @Override

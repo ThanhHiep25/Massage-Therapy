@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService {
 
     private final JwtUtil jwtUtil;
 
+    // Đăng ký tạm thời cho khách hàng
     @Override
     public UserResponse register(UserRegisterRequest user) {
 
@@ -84,6 +85,43 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    // Đăng ký tạm thời cho nhân viên
+    @Override
+    public UserResponse registerStaff(UserRegisterRequest user) {
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTED);
+        }
+
+        // Lấy role từ database thay vì gán trực tiếp từ request
+        Role role = roleService.findByName(user.getRole() != null ? user.getRole().getRoleName() : "staff");
+        if (role == null) {
+            throw new RuntimeException("Role not found.");
+        }
+
+        // Tạo OTP và gửi qua email
+        String otp = otpService.generateOtp();
+        otpService.sendOtpEmail(user.getEmail(), otp);
+
+        // Gán lại role lấy từ database
+        user.setRole(role);
+
+        // Lưu thông tin đăng ký tạm thời
+        otpService.savePendingUser(user);
+
+        return UserResponse.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .name(user.getName())
+                .imageUrl(user.getImageUrl())
+                .description(user.getDescription())
+                .address(user.getAddress())
+                .role(role.getRoleName()) // ✅ Sử dụng role đã lấy từ DB
+                .build();
+    }
+
+    // Tạo người dùng
     @Override
     public UserResponse createUser(UserRegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -109,7 +147,7 @@ public class UserServiceImpl implements UserService {
                 .imageUrl(request.getImageUrl())
                 .description(request.getDescription())
                 .status(UserStatus.ACTIVATE) // Mặc định là ACTIVE
-                .role(role) // ✅ Gán Role lấy từ database
+                .role(role) // Gán Role lấy từ database
                 .build();
 
         userRepository.save(userToSave);
@@ -124,6 +162,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    // Xác thực OTP
     public UserResponse verifyOtp(String email, String otp) {
         String verificationResult = otpService.verifyOtp(email, otp);
 
@@ -174,6 +213,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    // Đăng nhập người dùng
     @Override
     public Map<String, Object> login(UserLoginRequest request) {
 
@@ -294,6 +334,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllAdmins() {
         return userRepository.findAllByRoleRoleName("admin");
+    }
+
+    @Override
+    public List<User> getAllStaff() {
+        return userRepository.findAllByRoleRoleName("staff");
     }
 
     @Override

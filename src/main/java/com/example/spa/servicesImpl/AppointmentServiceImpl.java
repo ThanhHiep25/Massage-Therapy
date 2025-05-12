@@ -176,33 +176,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
     // Cập nhật lịch hẹn
-//    @Override
-//    public Appointment updateAppointment(Long id, AppointmentRequest request) {
-//        Appointment appointment = appointmentRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Lịch hẹn không tồn tại"));
-//
-//        User user = userRepository.findById(request.getUserId())
-//                .orElseThrow(() -> new EntityNotFoundException("User không tồn tại"));
-//
-//        List<ServiceSpa> services = serviceSpaRepository.findAllById(request.getServiceIds());
-//        if (services.isEmpty()) {
-//            throw new IllegalArgumentException("Không có dịch vụ hợp lệ được chọn");
-//        }
-//
-//        BigDecimal totalPrice = services.stream()
-//                .map(service -> BigDecimal.valueOf(service.getPrice()))
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        appointment.setUser(user);
-//        appointment.setAppointmentDateTime(request.getAppointmentDateTime());
-//        appointment.setNotes(request.getNotes());
-//        appointment.setStatus(request.getStatus() != null ? request.getStatus() : AppointmentStatus.PENDING);
-//        appointment.setTotalPrice(totalPrice);
-//        appointment.setServices(services);
-//
-//        return appointmentRepository.save(appointment);
-//    }
-
     @Override
     public Appointment updateAppointment(Long id, AppointmentRequest request) {
         Appointment appointment = appointmentRepository.findById(id)
@@ -406,6 +379,34 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public long countAppointments() {
         return appointmentRepository.count();
+    }
+
+    // Thống kê số lượng đặt và tổng giá của từng dịch vụ
+    @Override
+    public Map<String, Map<String, Object>> getServiceUsageWithTotalPrice() {
+        List<Appointment> allAppointments = appointmentRepository.findAll();
+        Map<String, Map<String, Object>> serviceUsage = new HashMap<>();
+
+        for (Appointment appointment : allAppointments) {
+            for (ServiceSpa service : appointment.getServices()) {
+                String serviceName = service.getName();
+                double servicePrice = service.getPrice();
+
+                if (serviceUsage.containsKey(serviceName)) {
+                    Map<String, Object> serviceData = serviceUsage.get(serviceName);
+                    long count = (long) serviceData.get("count");
+                    double totalPrice = (double) serviceData.get("totalPrice");
+                    serviceData.put("count", count + 1);
+                    serviceData.put("totalPrice", totalPrice + servicePrice);
+                } else {
+                    Map<String, Object> serviceData = new HashMap<>();
+                    serviceData.put("count", 1L);
+                    serviceData.put("totalPrice", servicePrice);
+                    serviceUsage.put(serviceName, serviceData);
+                }
+            }
+        }
+        return serviceUsage;
     }
 
     @Override

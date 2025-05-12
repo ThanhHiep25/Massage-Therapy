@@ -178,6 +178,7 @@ public class PaymentVNPayController {
         return new ResponseEntity<>(defaultFormat.format(totalAmount), HttpStatus.OK);
     }
 
+    // Thống kê thổng tiền thanh toán theo tháng
     @GetMapping("/revenue/monthly")
     @Operation(summary = "Thống kê thổng tiền thanh toán theo tháng", description = "Trả về thống kê thổng tiền thanh toán theo tháng",
             responses = {

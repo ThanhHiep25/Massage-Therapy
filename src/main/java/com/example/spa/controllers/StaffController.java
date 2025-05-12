@@ -7,6 +7,7 @@ import com.example.spa.exception.AppException;
 import com.example.spa.services.StaffService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,7 @@ public class StaffController {
                     @ApiResponse(responseCode = "400", description = "Dữ liệu không hợp lệ")
             }
     )
-    public ResponseEntity<Staff> createStaff(@RequestBody StaffRequest staffRequest) {
+    public ResponseEntity<Staff> createStaff(@Valid @RequestBody StaffRequest staffRequest) {
         return ResponseEntity.ok(staffService.createStaff(staffRequest));
     }
 

@@ -35,5 +35,14 @@ public interface ServiceSpaService {
 
     void activateServiceSpa(Long id);
 
+    //Lấy tổng số lượng dịch vụ spa
+    Long countServiceSpa();
+
+    //Thống kê số lượng dịch vụ theo danh mục
+    Map<String, Long> getServicesByCategory();
+
+    //Thống kê số lượng dịch vụ theo danh mục (trả về name và value)
+    List<Map.Entry<String, Long>> getServicesByCategoryWithNameValue();
+
     byte[] exportServiceSpasToExcel(List<ServiceSpaResponse> serviceSpas) throws IOException;
 }

@@ -1,0 +1,4 @@
+package com.example.spa.enums;
+
+public enum DiscountCodeStatus {
+}

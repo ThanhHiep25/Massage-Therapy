@@ -3,12 +3,12 @@ package com.example.spa.servicesImpl;
 import com.example.spa.dto.PaymentDTO;
 import com.example.spa.dto.response.OrderResponse;
 import com.example.spa.dto.response.PaymentOrderResponse;
-import com.example.spa.dto.response.PaymentResponse;
 import com.example.spa.entities.Order;
-import com.example.spa.entities.Payment;
 import com.example.spa.entities.PaymentOrder;
 import com.example.spa.enums.OrderStatus;
 import com.example.spa.enums.PaymentStatus;
+import com.example.spa.exception.AppException;
+import com.example.spa.exception.ErrorCode;
 import com.example.spa.repositories.OrderRepository;
 import com.example.spa.repositories.PaymentOrderRepository;
 import com.example.spa.services.MailService;
@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -260,5 +261,47 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         return paymentOrderRepository.findById(id);
     }
 
+    // setStatus SUCCESS
+    @Override
+    public void setStatusSuccess(Long id) {
+        PaymentOrder payment = paymentOrderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_EXISTED));
+        payment.setStatus(PaymentStatus.SUCCESS);
+        paymentOrderRepository.save(payment);
+    }
+
+    // Thống kê thổng số lần thanh toán
+    @Override
+    public long countPayments() {
+        return paymentOrderRepository.count();
+    }
+
+    // Thống kê thổng tiền thanh toán
+    @Override
+    public BigDecimal getSumAmount() {
+        return paymentOrderRepository.sumAllAmountPayment();
+    }
+
+    // Thống kê thổng tiền thanh toán theo tháng
+    @Override
+    public List<Map<String, Object>> getMonthlyPaymentRevenue() {
+        List<Object[]> results = paymentOrderRepository.sumPaymentAmountByMonth();
+        List<Map<String, Object>> monthlyRevenue = new ArrayList<>();
+
+        DecimalFormat defaultFormat = new DecimalFormat("#,##0.00");
+
+        for (Object[] result : results) {
+            Integer year = (Integer) result[0];
+            Integer month = (Integer) result[1];
+            BigDecimal totalAmount = (BigDecimal) result[2];
+
+            Map<String, Object> monthData = new HashMap<>();
+            monthData.put("year", year);
+            monthData.put("month", month);
+            monthData.put("totalRevenue", defaultFormat.format(totalAmount));
+            monthlyRevenue.add(monthData);
+        }
+        return monthlyRevenue;
+    }
 
 }

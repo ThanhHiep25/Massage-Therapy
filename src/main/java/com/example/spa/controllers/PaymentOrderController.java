@@ -15,8 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -144,6 +147,45 @@ public class PaymentOrderController {
     )
     public ResponseEntity<?> getAllTransactions() {
         return ResponseEntity.ok(paymentOrderService.findAll());
+    }
+
+    // Thống kê tổng thanh toán
+    @GetMapping("/vnpayOrder/total")
+    @Operation(summary = "Thống kê tổng thanh toán", description = "Trả về tất cả giao dịch thanh toán",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+                    @ApiResponse(responseCode = "404", description = "Không tìm thấy giao dịch")
+            }
+    )
+    public ResponseEntity<?> getTotalPayment() {
+        return ResponseEntity.ok(paymentOrderService.countPayments());
+    }
+
+    // Thống kê tổng amount payment
+    @GetMapping("/amountOrder/total")
+    @Operation(summary = "Thống kê tổng thanh toán", description = "Trả về tất cả giao dịch thanh toán",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+                    @ApiResponse(responseCode = "404", description = "Không tìm thấy giao dịch")
+            }
+    )
+    public ResponseEntity<?> getTotalPayments() {
+        DecimalFormat defaultFormat = new DecimalFormat("#,##0.00");
+        BigDecimal totalAmount = paymentOrderService.getSumAmount();
+        return new ResponseEntity<>(defaultFormat.format(totalAmount), HttpStatus.OK);
+    }
+
+    // Thống kê thổng tiền thanh toán theo tháng
+    @GetMapping("/revenueOrder/monthly")
+    @Operation(summary = "Thống kê thổng tiền thanh toán theo tháng", description = "Trả về thống kê thổng tiền thanh toán theo tháng",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+                    @ApiResponse(responseCode = "404", description = "Không tìm thấy giao dịch")
+            }
+    )
+    public ResponseEntity<List<Map<String, Object>>> getMonthlyRevenue() {
+        List<Map<String, Object>> monthlyRevenue = paymentOrderService.getMonthlyPaymentRevenue();
+        return new ResponseEntity<>(monthlyRevenue, HttpStatus.OK);
     }
 
 }

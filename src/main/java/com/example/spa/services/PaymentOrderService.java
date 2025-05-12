@@ -7,6 +7,7 @@ import com.example.spa.dto.response.PaymentResponse;
 import com.example.spa.entities.PaymentOrder;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,4 +25,16 @@ public interface PaymentOrderService {
 
     List<PaymentOrderResponse> findAll();
     Optional<PaymentOrder> findById(Long id);
+
+    // setStatus SUCCESS
+    void setStatusSuccess(Long id);
+
+    // Thống kê thổng số lần thanh toán
+    long countPayments();
+
+    // Thống kê thổng tiền thanh toán
+    BigDecimal getSumAmount();
+
+    // Thống kê thổng tiền thanh toán theo tháng
+    List<Map<String, Object>> getMonthlyPaymentRevenue();
 }
