@@ -17,6 +17,9 @@ public interface ServiceSpaService {
 
     List<ServiceSpa> getAllServiceSpas();
 
+    // Lấy danh sách ServiceSpa theo trạng thái ACTIVATE
+    List<ServiceSpa> getAllActiveServiceSpas();
+
     void deleteServiceSpa(Long id);
 
     ServiceSpa updateServiceSpa(Long id, ServiceSpaRequest request, List<ServiceStep> steps);

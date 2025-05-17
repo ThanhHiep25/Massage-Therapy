@@ -94,6 +94,12 @@ public class ServiceSpaServiceImpl implements ServiceSpaService {
         return serviceSpaRepository.findAll();
     }
 
+    // Lấy danh sách ServiceSpa theo trạng thái ACTIVATE
+    @Override
+    public List<ServiceSpa> getAllActiveServiceSpas() {
+        return serviceSpaRepository.findAllByStatus(StatusBasic.ACTIVATE);
+    }
+
     // Xoa ServiceSpa
 //    @Override
 //    @Transactional

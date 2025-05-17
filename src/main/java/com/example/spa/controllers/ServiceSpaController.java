@@ -71,6 +71,21 @@ public class ServiceSpaController {
         return ResponseEntity.ok(response);
     }
 
+    // lấy danh sách dịch vụ theo trạng thái ACTIVATE
+    @GetMapping("/get-all/active")
+    @Operation(summary = "Lấy tất cả dịch vụ spa theo trạng thái ACTIVATE")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Thành công"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public ResponseEntity<List<ServiceSpaResponse>> getAllActiveServiceSpas() {
+        List<ServiceSpaResponse> response = serviceSpaService.getAllActiveServiceSpas()
+                .stream()
+                .map(serviceSpa -> new ServiceSpaResponse(serviceSpa, serviceSpa.getSteps()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Cập nhật dịch vụ spa")
     @ApiResponses(value = {

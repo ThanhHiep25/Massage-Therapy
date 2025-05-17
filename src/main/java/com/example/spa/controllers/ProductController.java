@@ -52,7 +52,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Lấy thông tin sản phẩm theo id", description = "Trả về thông tin lịch hẹn")
+    @Operation(summary = "Lấy thông tin sản phẩm theo id", description = "Trả về sanh sách sản phẩm theo id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
@@ -63,7 +63,7 @@ public class ProductController {
     }
 
     @GetMapping
-    @Operation(summary = "Lấy danh sách sản phẩm", description = "Trả về danh sách lịch hẹn")
+    @Operation(summary = "Lấy danh sách sản phẩm", description = "Trả về danh sách sản phẩm")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hợp lệ"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy")
@@ -71,6 +71,17 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> allProducts = productService.getAllProducts();
         return ResponseEntity.ok(allProducts);
+    }
+
+    @GetMapping("/get-all/active")
+    @Operation(summary = "Lấy danh sách sản phẩm theo trạng thái Activate ", description = "Trả về danh sách sản phẩm theo trạng thái Activate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Hợp lệ"),
+            @ApiResponse(responseCode = "404", description = "Không tìm thấy")
+    })
+    public ResponseEntity<List<ProductResponse>> getActiveProducts() {
+        List<ProductResponse> activeProducts = productService.getActiveProducts();
+        return ResponseEntity.ok(activeProducts);
     }
 
     @DeleteMapping("/{id}")

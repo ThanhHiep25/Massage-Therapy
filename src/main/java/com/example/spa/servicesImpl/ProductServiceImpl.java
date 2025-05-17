@@ -183,6 +183,34 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    // Lấy danh sách sản phẩm theo trạng thái Activate
+    @Override
+    public List<ProductResponse> getActiveProducts() {
+        return productRepository.findByProductStatus(ProductStatus.ACTIVATE).stream()
+                .map(product -> {
+                    CategoryResponse categoryResponse = null;
+                    if (product.getCategory() != null) {
+                        categoryResponse = CategoryResponse.builder()
+                                .id(product.getCategory().getCategoryId())
+                                .name(product.getCategory().getCategoryName())
+                                .build();
+                    }
+                    return ProductResponse.builder()
+                            .id(product.getId())
+                            .nameProduct(product.getNameProduct())
+                            .description(product.getDescription())
+                            .price(product.getPrice())
+                            .category(categoryResponse) // Sử dụng categoryResponseelah ánh xạ
+                            .imageUrl(product.getImageUrl())
+                            .quantity(product.getQuantity())
+                            .createdAt(product.getCreatedAt())
+                            .updatedAt(product.getUpdatedAt())
+                            .productStatus(product.getProductStatus())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {

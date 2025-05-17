@@ -16,6 +16,9 @@ public interface ProductService {
 
     List<ProductResponse> getAllProducts();
 
+    // Lấy danh sách sản phẩm theo trạng thái Activate
+    List<ProductResponse> getActiveProducts();
+
     void deleteProduct(Long id);
 
     void activateProduct(Long id);
