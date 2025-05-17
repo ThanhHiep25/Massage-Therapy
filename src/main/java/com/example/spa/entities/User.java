@@ -69,6 +69,7 @@ public class User {
     @Column(name = "status", nullable = false)
     private UserStatus status = UserStatus.ACTIVATE; // Mặc định là ACTIVE
 
+
     @Override
     public String toString() {
         return "User{" +
@@ -76,10 +77,13 @@ public class User {
                 ", name='" + name + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", gender='" + gender + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
                 ", password='" + password + '\'' +
                 ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", fcmToken='" + fcmToken + '\'' +
                 ", role=" + role +
                 ", description='" + description + '\'' +
                 ", createdAt=" + createdAt +

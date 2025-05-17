@@ -170,8 +170,11 @@ public class OrderServiceImpl implements OrderService {
 //                .collect(Collectors.toList());
 //
 //        // Xóa các OrderItem cũ và thêm các OrderItem mới
-//        orderItemRepository.deleteAll(order.getOrderItems());
-//        order.setOrderItems(updatedOrderItems);
+//        order.getOrderItems().clear();
+//        for (OrderItem item : updatedOrderItems) {
+//            item.setOrder(order); // đảm bảo mối quan hệ 2 chiều
+//        }
+//        order.getOrderItems().addAll(updatedOrderItems);
 //
 //        // Tính toán lại tổng tiền
 //        BigDecimal totalAmount = updatedOrderItems.stream()

@@ -22,7 +22,6 @@ public class OpenAPIConfiguration {
         // Server Configuration
         Server server = new Server();
         server.setUrl(localHost);
-        //server.setUrl("http://192.168.1.177:5000");
         server.setDescription("Management API Documentation");
 
         // API Info

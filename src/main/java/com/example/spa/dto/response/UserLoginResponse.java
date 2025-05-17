@@ -3,6 +3,7 @@ package com.example.spa.dto.response;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +18,8 @@ public class UserLoginResponse {
     private String email;
     private String phone;
     private String address;
+    private String gender;
+    private LocalDate dateOfBirth;
     private String imageUrl;
     private LocalDateTime createdAt;
     private String description;
@@ -32,6 +35,8 @@ public class UserLoginResponse {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", address='" + address + '\'' +
+                ", gender='" + gender + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", createdAt=" + createdAt +
                 ", description='" + description + '\'' +

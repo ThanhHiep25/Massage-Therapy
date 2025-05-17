@@ -12,10 +12,19 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${url}")  // URL của ứng dụng frontend
     private String frontendUrl;
 
+    @Value("${url_client}")
+    private String url_Client;
+
+    @Value("${url_netlify}")
+    private String urlNetlify;
+
+    @Value("${url_railway}")
+    private String urlRailway;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**") // Áp dụng cho tất cả các endpoint
-                .allowedOrigins(frontendUrl) // Cho phép yêu cầu từ ứng dụng frontend
+                .allowedOrigins(frontendUrl, urlNetlify, urlRailway, url_Client) // Cho phép yêu cầu từ ứng dụng frontend
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Các phương thức HTTP được phép
                 .allowCredentials(true) // Cho phép gửi cookies nếu cần thiết
                 .allowedHeaders("*"); // Cho phép tất cả các headers
