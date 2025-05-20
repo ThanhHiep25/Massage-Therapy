@@ -12,10 +12,7 @@ import com.example.spa.repositories.AppointmentRepository;
 import com.example.spa.repositories.ServiceSpaRepository;
 import com.example.spa.repositories.StaffRepository;
 import com.example.spa.repositories.UserRepository;
-import com.example.spa.services.AppointmentService;
-import com.example.spa.services.MailService;
-import com.example.spa.services.NotificationService;
-import com.example.spa.services.UserService;
+import com.example.spa.services.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
@@ -43,6 +40,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final ServiceSpaRepository serviceSpaRepository;
     private final NotificationService notificationService;
     private final UserService userService;
+    private final PaymentVNPayService paymentVNPayService;
 
     private final MailService mailService;
 
@@ -107,6 +105,38 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_INVALID));
         return new AppointmentResponse(appointment);
     }
+
+    // Lấy danh sách lịch hẹn theo userid
+    @Override
+    public List<AppointmentResponse> getAllAppointmentsByUserId(Long userId) {
+        try {
+            return appointmentRepository.findByUser_UserId(userId).stream().map(appointment -> {
+                return AppointmentResponse.builder()
+                        .id(appointment.getAppointmentId())
+                        .userId(new UserResponse(appointment.getUser()))
+                        .appointmentDateTime(appointment.getAppointmentDateTime())
+                        .gustName(appointment.getGuestName())
+                        .totalPrice(appointment.getTotalPrice())
+                        .notes(appointment.getNotes())
+                        .status(appointment.getStatus())
+                        .serviceIds(
+                                appointment.getServices().stream()
+                                        .map(serviceSpa -> new ServiceSpaResponse(
+                                                serviceSpa,
+                                                serviceSpa.getSteps() != null ? serviceSpa.getSteps() : Collections.emptyList()
+                                        ))
+                                        .collect(Collectors.toList())
+                        )
+                        .createdAt(appointment.getCreatedAt())
+                        .updatedAt(appointment.getUpdatedAt())
+                        .build();
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.APPOINTMENT_INVALID);
+        }
+    }
+
+
 
 
     // Lấy danh sách lịch hẹn
@@ -345,8 +375,17 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void paidAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_INVALID));
+
+        if (appointment.getStatus() == AppointmentStatus.PAID) {
+            System.out.println("Appointment " + id + " is already marked as PAID.");
+        }
         appointment.setStatus(AppointmentStatus.PAID);
-        appointmentRepository.save(appointment);
+        appointment.setUpdatedAt(LocalDateTime.now());
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+
+        paymentVNPayService.createCashPaymentForAppointment(savedAppointment);
+
+        System.out.println("Appointment " + id + " status set to PAID and cash payment recorded.");
     }
 
     // Thống kê tổng số lịch hẹn theo trạng thái

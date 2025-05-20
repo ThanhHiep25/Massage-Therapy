@@ -48,9 +48,6 @@ public class User {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "fcm_token")
-    private String fcmToken;
-
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "role_id")
     private Role role;
@@ -83,7 +80,6 @@ public class User {
                 ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", fcmToken='" + fcmToken + '\'' +
                 ", role=" + role +
                 ", description='" + description + '\'' +
                 ", createdAt=" + createdAt +

@@ -2,12 +2,9 @@ package com.example.spa.services;
 
 import com.example.spa.dto.request.StaffServiceRequest;
 import com.example.spa.dto.response.StaffServiceResponse;
-import com.example.spa.entities.Staff;
-import com.example.spa.entities.StaffServiceSpa;
-import com.example.spa.enums.StaffServiceStatus;
+import com.example.spa.entities.StaffAppointment;
 
 import java.util.List;
-import java.util.Map;
 
 public interface StaffServiceSpaService {
 
@@ -15,7 +12,7 @@ public interface StaffServiceSpaService {
 
     List<StaffServiceResponse> getStaffByService(Long serviceId);
 
-    List<StaffServiceSpa> getServicesByStaff(Long staffId);
+    List<StaffAppointment> getServicesByStaff(Long staffId);
 
     void deleteStaffService(Long id);
 

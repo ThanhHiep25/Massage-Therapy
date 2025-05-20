@@ -48,10 +48,6 @@ public class Staff {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    @ManyToOne
-    @JsonIgnore
-    private Department department;
-
     @ManyToMany
     @JoinTable(
             name = "staff_service",

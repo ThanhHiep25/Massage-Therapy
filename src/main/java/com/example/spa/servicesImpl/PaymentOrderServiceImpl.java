@@ -25,8 +25,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,6 +69,34 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
 
         return paymentOrderRepository.save(payment);
     }
+
+    @Override
+    public PaymentOrder createCashPaymentForOrder(Order order) {
+        if (order == null) {
+            throw new IllegalArgumentException("Order cannot be null for cash payment.");
+        }
+        if (order.getTotalAmount() == null) {
+            throw new IllegalArgumentException("Order total amount cannot be null.");
+        }
+
+        PaymentOrder payment = new PaymentOrder();
+        payment.setOrder(order);
+        payment.setAmount(order.getTotalAmount()); // Use the order's total amount
+        payment.setPaymentMethod("Tiền mặt"); // Payment method is Cash
+        payment.setStatus(PaymentStatus.SUCCESS); // Status is SUCCESS for cash
+        payment.setTransactionTime(LocalDateTime.now());
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setCreatedAt(LocalDateTime.now());
+        payment.setUpdatedAt(LocalDateTime.now());
+        payment.setTransactionId("CASH-" + order.getId() + "-" + UUID.randomUUID().toString().substring(0, 8)); // Simple unique ID for cash
+        payment.setIsDeposit(true); // Typically, a cash payment is a full payment/deposit
+
+        PaymentOrder savedPayment = paymentOrderRepository.save(payment);
+
+
+        return savedPayment;
+    }
+
 
     // Tạo URL thanh toán VNPay
     @Override
@@ -251,7 +277,7 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
                 queryUrl);
     }
 
-     // Lấy tất cả thanh toán
+    // Lấy tất cả thanh toán
     @Override
     public List<PaymentOrderResponse> findAll() {
         List<PaymentOrder> payments = paymentOrderRepository.findAll();
@@ -276,7 +302,7 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
     // Thống kê thổng số lần thanh toán
     @Override
     public long countPayments() {
-        return paymentOrderRepository.count();
+        return paymentOrderRepository.countByStatus(PaymentStatus.SUCCESS);
     }
 
     // Thống kê thổng tiền thanh toán

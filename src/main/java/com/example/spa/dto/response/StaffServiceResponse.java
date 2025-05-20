@@ -33,7 +33,7 @@ package com.example.spa.dto.response;
 //
 //}
 
-import com.example.spa.entities.StaffServiceSpa;
+import com.example.spa.entities.StaffAppointment;
 import lombok.*;
 import java.time.LocalDate;
 
@@ -51,7 +51,7 @@ public class StaffServiceResponse {
     private String note;
     private String status;
 
-    public StaffServiceResponse(StaffServiceSpa entity) {
+    public StaffServiceResponse(StaffAppointment entity) {
         this.id = entity.getId();
         this.staff = new StaffResponse(entity.getStaff());
         this.appointment = new AppointmentResponse(entity.getAppointment());

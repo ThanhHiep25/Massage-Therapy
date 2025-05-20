@@ -45,21 +45,8 @@ public class StaffServiceSpaServiceImpl implements StaffServiceSpaService {
         Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-        Department department = departmentRepository.findById(request.getDepartmentId())
+        Department department = departmentRepository.findById(request.getDepartmentId()) // Fetch Department
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_FOUND));
-
-        List<StaffAppointment> existingAssignmentsForAppointment = staffServiceSpaRepository
-                .findByAppointment_AppointmentId(appointment.getAppointmentId());
-
-        // Nếu có gán phòng nào đó cho lịch hẹn này VÀ phòng đó KHÔNG phải là phòng đang được gán
-        if (!existingAssignmentsForAppointment.isEmpty()) {
-            for (StaffAppointment existingAssignment : existingAssignmentsForAppointment) {
-                if (existingAssignment.getDepartment() != null &&
-                        !existingAssignment.getDepartment().getDepartmentId().equals(department.getDepartmentId())) {
-                    throw new AppException(ErrorCode.APPOINTMENT_ALREADY_ASSIGNED_TO_ANOTHER_DEPARTMENT);
-                }
-            }
-        }
 
         List<StaffAppointment> existingAssignmentsForAppointmentAndDepartment = staffServiceSpaRepository
                 .findByAppointment_AppointmentIdAndDepartment_DepartmentId(

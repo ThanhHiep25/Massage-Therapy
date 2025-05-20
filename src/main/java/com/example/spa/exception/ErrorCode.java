@@ -94,7 +94,7 @@ public enum ErrorCode {
     APPOINTMENT_CANCELLED(1222, "Appointment cancelled", HttpStatus.OK),
     APPOINTMENT_COMPLETED(1333, "Appointment completed", HttpStatus.OK),
     APPOINTMENT_SCHEDULED(1444, "Appointment scheduled", HttpStatus.OK),
-
+    APPOINTMENT_ALREADY_ASSIGNED_TO_ANOTHER_DEPARTMENT(1006, "Appointment already assigned to another department" , HttpStatus.BAD_REQUEST ),
     // Service
     SERVICE_INVALID(1001, "Service  error", HttpStatus.NOT_FOUND),
     SERVICE_NOT_FOUND(404, "Service not found", HttpStatus.NOT_FOUND),
@@ -128,7 +128,7 @@ public enum ErrorCode {
     INVALID_ORDER_STATUS(1010, "Invalid order status", HttpStatus.BAD_REQUEST),
 
 
-    DISCOUNT_CODE_EXISTED(1006  , "Discount code existed", HttpStatus.BAD_REQUEST );
+    DISCOUNT_CODE_EXISTED(1006  , "Discount code existed", HttpStatus.BAD_REQUEST ), ;
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;
         this.message = message;

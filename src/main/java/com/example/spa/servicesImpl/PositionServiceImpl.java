@@ -37,7 +37,16 @@ public class PositionServiceImpl implements PositionService {
         if (positionExists(position.getPositionId())) {
             throw new AppException(ErrorCode.POSITION_ALREADY_EXISTED);
         }
+
+        if(positionExistName(position.getPositionName())){
+            throw new AppException(ErrorCode.POSITION_ALREADY_EXISTED);
+        }
+
         return positionRepository.save(position);
+    }
+
+    private boolean positionExistName(String name) {
+        return positionRepository.existsByPositionName(name);
     }
 
     @Override

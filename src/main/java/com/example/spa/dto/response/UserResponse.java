@@ -57,6 +57,8 @@ public class UserResponse {
                 ", address='" + address + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", description='" + description + '\'' +
+                ", gender='" + gender + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
                 ", role='" + role + '\'' +
                 ", status='" + status + '\'' +
                 ", createdAt=" + createdAt +

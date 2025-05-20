@@ -17,10 +17,14 @@ public interface AppointmentService {
 
     AppointmentResponse getAppointmentById(Long id);
 
-    List<AppointmentResponse> getAllAppointments();
-
     // Lấy danh sách lịch hẹn theo userid
     List<AppointmentResponse> getAppointmentsByUserId(Long userId);
+
+    // Lấy danh sách lịch hẹn theo userid
+    List<AppointmentResponse> getAllAppointmentsByUserId(Long userId);
+
+    List<AppointmentResponse> getAllAppointments();
+
 
     Appointment updateAppointment(Long id, AppointmentRequest request);
 

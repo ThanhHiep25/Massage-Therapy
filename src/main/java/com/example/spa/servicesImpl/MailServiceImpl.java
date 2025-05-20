@@ -29,7 +29,7 @@ public class MailServiceImpl implements MailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(toEmail);
-            helper.setSubject("Spa Booking Notification - 🍃");
+            helper.setSubject("THÔNG TIN LỊCH HẸN - 🍃");
 
 //            String servicesHtml = appointment.getServiceIds().stream()
 //                    .map(service -> "<li>• " + service.getName() + "</li>")
@@ -103,7 +103,7 @@ public class MailServiceImpl implements MailService {
                                                               <strong>Ghi chú:</strong> %s
                                                           </li>
                                                           <li>
-                                                              <strong>Trạng thái:</strong> %s
+                                                              <strong>Trạng thái:</strong> Đã xác nhận
                                                           </li>
                                                           <li>
                                                               <strong>Tổng tiền:</strong> %s VND
@@ -134,7 +134,7 @@ public class MailServiceImpl implements MailService {
                     appointment.getUserId() != null ? appointment.getUserId().getPhone() : "N/A",
                     formattedDateTime,
                     appointment.getNotes() != null ? appointment.getNotes() : "(Không có)",
-                    appointment.getStatus().name(),
+                    //appointment.getStatus().name(),
                     totalFormatted,
                     servicesHtml
             );
@@ -209,7 +209,7 @@ public class MailServiceImpl implements MailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
             helper.setTo(email);
-            helper.setSubject("THONG TIN LICH HEN");
+            helper.setSubject("HỦY LỊCH HẸN - 🍃");
             String emailContent = """
                           <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #fefefe;">
                                    <div style="text-align: center;">

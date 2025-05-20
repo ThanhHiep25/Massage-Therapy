@@ -11,6 +11,7 @@ import com.example.spa.repositories.OrderRepository;
 import com.example.spa.repositories.ProductRepository;
 import com.example.spa.repositories.UserRepository;
 import com.example.spa.services.OrderService;
+import com.example.spa.services.PaymentOrderService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -33,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final PaymentOrderService paymentOrderService;
 
     //    @Override
 //    @Transactional
@@ -240,6 +242,15 @@ public class OrderServiceImpl implements OrderService {
         if (!orderRepository.existsById(id)) {
             throw new AppException(ErrorCode.ORDER_NOT_FOUND);
         }
+
+        Order orderToDeleted = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        // Trả lại sản phẩm về kho
+        if (orderToDeleted.getStatus() != OrderStatus.CANCELLED) {
+            returnProductsToStock(orderToDeleted);
+        }
+
         orderRepository.deleteById(id);
     }
 
@@ -275,17 +286,45 @@ public class OrderServiceImpl implements OrderService {
     public void cancelledOrder(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.REFUND) {
+            System.out.println("Order " + id + " canccelled");
+            return;
+        }
+        // Hoàn trả số lượng sản phẩm về kho
+        returnProductsToStock(order);
+
         order.setStatus(OrderStatus.CANCELLED);
+        order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
     }
 
     // Cập nhật trạng thái PAID
+//    @Override
+//    public void paidOrder(Long id) {
+//        Order order = orderRepository.findById(id)
+//                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+//        order.setStatus(OrderStatus.PAID);
+//        orderRepository.save(order);
+//    }
+
     @Override
+    @Transactional
     public void paidOrder(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        if (order.getStatus() == OrderStatus.PAID) {
+            System.out.println("Order " + id + " is already marked as PAID.");
+        }
+
         order.setStatus(OrderStatus.PAID);
-        orderRepository.save(order);
+        order.setUpdatedAt(LocalDateTime.now()); // Also update the 'updatedAt' timestamp
+        Order savedOrder = orderRepository.save(order);
+
+        // Create a corresponding cash payment record
+        paymentOrderService.createCashPaymentForOrder(savedOrder);
+
+        System.out.println("Order " + id + " status set to PAID and cash payment recorded.");
     }
 
     // Cập nhật trạng thái REFUND
@@ -293,6 +332,14 @@ public class OrderServiceImpl implements OrderService {
     public void refundOrder(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (order.getStatus() == OrderStatus.REFUND || order.getStatus() == OrderStatus.CANCELLED) {
+            System.out.println("Order " + id + " refunded");
+            return;
+        }
+
+        // Hoàn trả số lượng sản phẩm về kho
+        returnProductsToStock(order);
         order.setStatus(OrderStatus.REFUND);
         orderRepository.save(order);
     }
@@ -455,6 +502,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-
+    // Trả lại sản phẩm
+    private void returnProductsToStock(Order order) {
+        for (OrderItem item : order.getOrderItems()) {
+            Product product = item.getProduct();
+            // Cập nhật số lượng sản phẩm trong kho
+            product.setQuantity(product.getQuantity() + item.getQuantity());
+            productRepository.save(product); // Lưu lại sản phẩm đã cập nhật
+            System.out.println("Returned " + item.getQuantity() + " of product " + product.getNameProduct() + " to stock.");
+        }
+    }
 
 }

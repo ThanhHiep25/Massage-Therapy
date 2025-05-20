@@ -33,4 +33,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<AppointmentResponse> findByStatus(String status);
 
+
 }

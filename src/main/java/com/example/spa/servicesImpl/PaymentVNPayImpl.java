@@ -75,6 +75,32 @@ public class PaymentVNPayImpl implements PaymentVNPayService {
     }
 
     @Override
+    public Payment createCashPaymentForAppointment(Appointment appointment) {
+        if (appointment == null) {
+            throw new IllegalArgumentException("Order cannot be null for cash payment.");
+        }
+        if (appointment.getTotalPrice() == null) {
+            throw new IllegalArgumentException("Order total amount cannot be null.");
+        }
+
+        Payment payment = new Payment();
+        payment.setAppointment(appointment);
+        payment.setAmount(appointment.getTotalPrice());
+        payment.setPaymentMethod("Tiền mặt");
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setTransactionTime(LocalDateTime.now());
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setCreatedAt(LocalDateTime.now());
+        payment.setUpdatedAt(LocalDateTime.now());
+        payment.setTransactionId("CASH-" + appointment.getAppointmentId() + "-" + UUID.randomUUID().toString().substring(0, 8)); // Simple unique ID for cash
+        payment.setIsDeposit(true); // Typically, a cash payment is a full payment/deposit
+        Payment savedPayment = paymentRepository.save(payment);
+
+
+        return savedPayment;
+    }
+
+    @Override
     public Payment createPaymentGooglePay(AppointmentResponse appointmentResponse, Long amount, String paymentMethod) {
         // Lấy đối tượng Appointment từ database dựa trên ID trong AppointmentResponse
         Appointment appointment = appointmentRepository.findById(appointmentResponse.getId())
@@ -322,7 +348,7 @@ public class PaymentVNPayImpl implements PaymentVNPayService {
     // Thống kê thổng số lần thanh toán
     @Override
     public long countPayments() {
-        return paymentRepository.count();
+        return paymentRepository.countByStatus(PaymentStatus.SUCCESS);
     }
 
     // Thống kê thổng tiền thanh toán

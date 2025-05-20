@@ -9,7 +9,6 @@ import java.util.Optional;
 import com.example.spa.dto.PaymentDTO;
 import com.example.spa.dto.response.AppointmentResponse;
 import com.example.spa.dto.response.PaymentResponse;
-import com.example.spa.entities.Appointment;
 import com.example.spa.entities.Payment;
 
 
@@ -17,9 +16,7 @@ public interface PaymentVNPayService {
 
 	Payment createPayment(AppointmentResponse appointment, Long amount, String paymentMethod, String status);
 
-    Payment createCashPaymentForAppointment(Appointment appointment);
-
-    Payment createPaymentGooglePay(AppointmentResponse appointmentResponse, Long amount, String paymentMethod);
+	Payment createPaymentGooglePay(AppointmentResponse appointmentResponse, Long amount, String paymentMethod);
 
 	String createVNPayPayment(AppointmentResponse appointment, Long amount);
 

@@ -4,6 +4,7 @@ import com.example.spa.dto.PaymentDTO;
 import com.example.spa.dto.response.OrderResponse;
 import com.example.spa.dto.response.PaymentOrderResponse;
 import com.example.spa.dto.response.PaymentResponse;
+import com.example.spa.entities.Order;
 import com.example.spa.entities.PaymentOrder;
 
 import java.io.UnsupportedEncodingException;
@@ -37,4 +38,6 @@ public interface PaymentOrderService {
 
     // Thống kê thổng tiền thanh toán theo tháng
     List<Map<String, Object>> getMonthlyPaymentRevenue();
+
+    PaymentOrder createCashPaymentForOrder(Order order);
 }

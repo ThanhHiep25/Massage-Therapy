@@ -411,6 +411,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
+
     // Lấy thông tin theo id
     @Override
     public UserResponse getUserById(Long id) {
@@ -517,7 +518,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public byte[] exportUsersToExcel() throws IOException {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllByRoleRoleName("customer");
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Users");
@@ -538,7 +539,7 @@ public class UserServiceImpl implements UserService {
 
         // Tạo header row
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"Mã khách hàng", "Email", "Họ tên khách hàng", "Số điện thoại", "Địa chỉ", "Ảnh URL", "Hội viên", "Trạng thái", "Ngày tạo", "Ngày cập nhật"};
+        String[] headers = {"Mã khách hàng", "Email", "Họ tên khách hàng","Giới tính", "Ngày sinh", "Số điện thoại", "Địa chỉ", "Ảnh URL", "Hội viên", "Trạng thái", "Ngày tạo", "Ngày cập nhật"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);

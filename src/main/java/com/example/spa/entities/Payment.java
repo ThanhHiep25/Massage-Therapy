@@ -39,7 +39,7 @@ public class Payment {
   @Column(name = "payment_date", nullable = false)
   private LocalDateTime paymentDate; // Thời gian thanh toán
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "appointment_id", nullable = false)
   @JsonIgnore
   private Appointment appointment;

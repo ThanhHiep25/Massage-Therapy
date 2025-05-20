@@ -8,13 +8,13 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "staff_service")
+@Table(name = "staff_appointment")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StaffServiceSpa {
+public class StaffAppointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
