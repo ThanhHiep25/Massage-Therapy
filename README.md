@@ -22,7 +22,7 @@ Hệ thống quản lý SPA Massage là một nền tảng giúp quản lý tổ
    - Khách hàng có thể xem lịch hẹn còn trống và đặt dịch vụ trực tuyến.
 
 4. **Tích hợp thanh toán:**
-   - Hỗ trợ các hình thức thanh toán như: Google Pay, MoMo, Zalo Pay.
+   - Hỗ trợ các hình thức thanh toán như: Google Pay, VNPAY.
 
 5. **Quản lý phân quyền:**
    - Admin: Quản lý dữ liệu toàn hệ thông.
